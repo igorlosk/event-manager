@@ -15,8 +15,11 @@ public interface LocationRepository extends JpaRepository<LocationEntity, Intege
             loc.address = :address,
             loc.capacity = :capacity,
             loc.description = :description
+                        where loc.id = :id
+                                    
             """)
     void updateLocation(
+            @Param("id") Integer id,
             @Param("name") String name,
             @Param("address") String address,
             @Param("capacity") Integer capacity,

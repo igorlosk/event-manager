@@ -6,7 +6,7 @@ spring:
     name: event-manager
 
   datasource:
-    url: jdbc:postgresql://localhost:5431/event_manager
+    url: jdbc:postgresql://localhost:5431/postgres
     username: postgres
     password: root
 

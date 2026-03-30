@@ -49,6 +49,7 @@ public class LocationService {
         }
 
         locationRepository.updateLocation(
+                id,
                 location.name(),
                 location.address(),
                 location.capacity(),
