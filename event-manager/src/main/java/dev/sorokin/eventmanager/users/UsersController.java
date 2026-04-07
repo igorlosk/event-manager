@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.users;
 
+import dev.sorokin.eventmanager.security.jwt.JwtAuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.*;
 import org.springframework.http.*;
@@ -13,14 +14,16 @@ public class UsersController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
 
-    public UsersController(UserService userService) {
+    private final JwtAuthenticationService authenticationService;
+
+    public UsersController(UserService userService, JwtAuthenticationService authenticationService) {
         this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @PostMapping()
     public ResponseEntity<UserDto> registerUser(
-            @RequestBody @Valid SingUpRequest singUpRequest) {
-        LOGGER.info("Get request for singUp: login={}", singUpRequest.login());
+            @RequestBody @Valid SingUpRequest singUpRequest) {        LOGGER.info("Get request for singUp: login={}", singUpRequest.login());
         var user = userService.registerUser(singUpRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -35,10 +38,9 @@ public class UsersController {
             @RequestBody @Valid SignInRequest signInRequest
     ){
         LOGGER.info("Get request for sign-in: login={}", signInRequest.login());
+        var token = authenticationService.authenticateUser(signInRequest);
 
-
-
-
+        return ResponseEntity.status(HttpStatus.OK).body(new JwtTokenResponse(token));
     }
 
 

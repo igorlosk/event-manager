@@ -6,8 +6,7 @@ public record SignInRequest(
         @NotBlank
         String login,
         @NotBlank
-        String password,
-        @NotNull
-        Integer age
+        String password
+
 ) {
 }
