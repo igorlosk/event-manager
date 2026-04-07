@@ -30,5 +30,6 @@ springdoc:
     path: /swagger-ui/index.html
     url: /event-manager-openapi.yaml
 
-
+jwt:
+  secretKey: Vw47liBU9qsTTOQVh26DSCMXO04XZyAQsRslmH3QlT6
 

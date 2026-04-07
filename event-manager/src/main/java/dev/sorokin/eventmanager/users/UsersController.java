@@ -29,4 +29,17 @@ public class UsersController {
                         user.login()
                 ));
     }
+
+    @PostMapping("/auth")
+    public ResponseEntity<JwtTokenResponse> authenticate(
+            @RequestBody @Valid SignInRequest signInRequest
+    ){
+        LOGGER.info("Get request for sign-in: login={}", signInRequest.login());
+
+
+
+
+    }
+
+
 }
