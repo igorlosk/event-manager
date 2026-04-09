@@ -30,7 +30,7 @@ public class JwtTokenManager {
                 .parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseEncryptedClaims(token)
+                .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }

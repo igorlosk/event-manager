@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.security;
 
+import dev.sorokin.eventmanager.security.jwt.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
@@ -14,17 +15,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 @Configuration
 public class SecurityConfiguration {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-
     @Autowired
     private CustomAuthenticationEntryPoint  customAuthenticationEntryPoint;
     @Autowired
     private CustomAccessDeniedHandler  customAccessDeniedHandler;
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,7 +51,7 @@ public class SecurityConfiguration {
                         exception
                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                                 .accessDeniedHandler(customAccessDeniedHandler))
-                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtTokenFilter, AnonymousAuthenticationFilter.class)
                 .build();
     }
 

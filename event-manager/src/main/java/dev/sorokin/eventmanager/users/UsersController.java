@@ -23,7 +23,8 @@ public class UsersController {
 
     @PostMapping()
     public ResponseEntity<UserDto> registerUser(
-            @RequestBody @Valid SingUpRequest singUpRequest) {        LOGGER.info("Get request for singUp: login={}", singUpRequest.login());
+            @RequestBody @Valid SingUpRequest singUpRequest) {
+        LOGGER.info("Get request for singUp: login={}", singUpRequest.login());
         var user = userService.registerUser(singUpRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -41,6 +42,14 @@ public class UsersController {
         var token = authenticationService.authenticateUser(signInRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(new JwtTokenResponse(token));
+    }
+
+    @GetMapping("/{id}")
+    public UserDto getUserById(@PathVariable("id") Long id){
+        LOGGER.info("Get user by id={}",id);
+        var user = userService.findById(id);
+
+
     }
 
 
