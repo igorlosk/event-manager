@@ -1,14 +1,9 @@
 package dev.sorokin.eventmanager.security.jwt;
 
-import dev.sorokin.eventmanager.users.User;
-import dev.sorokin.eventmanager.users.UserService;
-import dev.sorokin.eventmanager.users.UsersController;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.sorokin.eventmanager.users.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import org.slf4j.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,13 +44,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
         String jwtToken;
         try {
-             jwtToken = authorizationHeader.substring(7);
-        } catch (Exception e){
+            jwtToken = authorizationHeader.substring(7);
+        } catch (Exception e) {
             logger.error("Error while reading jwt", e);
             filterChain.doFilter(request, response);
             return;
         }
-
 
         String loginFromToken = jwtTokenManager.getLoginFromToken(jwtToken);
 

@@ -16,9 +16,15 @@ public class UsersController {
 
     private final JwtAuthenticationService authenticationService;
 
-    public UsersController(UserService userService, JwtAuthenticationService authenticationService) {
+    private final UserToDtoMapper userToDtoMapper;
+
+    public UsersController(
+            UserService userService,
+            JwtAuthenticationService authenticationService,
+            UserToDtoMapper userToDtoMapper) {
         this.userService = userService;
         this.authenticationService = authenticationService;
+        this.userToDtoMapper = userToDtoMapper;
     }
 
     @PostMapping()
@@ -28,7 +34,7 @@ public class UsersController {
         var user = userService.registerUser(singUpRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new  UserDto(
+                .body(new UserDto(
                         user.id(),
                         user.login()
                 ));
@@ -37,7 +43,7 @@ public class UsersController {
     @PostMapping("/auth")
     public ResponseEntity<JwtTokenResponse> authenticate(
             @RequestBody @Valid SignInRequest signInRequest
-    ){
+    ) {
         LOGGER.info("Get request for sign-in: login={}", signInRequest.login());
         var token = authenticationService.authenticateUser(signInRequest);
 
@@ -45,12 +51,8 @@ public class UsersController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable("id") Long id){
-        LOGGER.info("Get user by id={}",id);
-        var user = userService.findById(id);
-
-
+    public UserDto getUserById(@PathVariable("id") Long id) {
+        LOGGER.info("Get user by id={}", id);
+        return userToDtoMapper.userToDto(userService.findById(id));
     }
-
-
 }

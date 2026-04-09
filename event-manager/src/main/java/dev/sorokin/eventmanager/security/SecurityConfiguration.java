@@ -6,13 +6,11 @@ import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
@@ -23,9 +21,9 @@ public class SecurityConfiguration {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
-    private CustomAuthenticationEntryPoint  customAuthenticationEntryPoint;
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
-    private CustomAccessDeniedHandler  customAccessDeniedHandler;
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
 
@@ -39,15 +37,16 @@ public class SecurityConfiguration {
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("ADMIN", "USER")
-                                .requestMatchers(HttpMethod.POST, "/locations").hasAnyAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/locations/**").hasAnyAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/locations/**").hasAnyAuthority("ADMIN", "USER")
-                                .requestMatchers(HttpMethod.PUT, "/locations/**").hasAnyAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.GET, "/locations/**").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.POST, "/locations").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/locations/**").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/locations/**").hasAnyAuthority("ADMIN")
                                 .anyRequest().authenticated())
-                .exceptionHandling(exception->
+                .exceptionHandling(exception ->
                         exception
                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                                 .accessDeniedHandler(customAccessDeniedHandler))
@@ -70,7 +69,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

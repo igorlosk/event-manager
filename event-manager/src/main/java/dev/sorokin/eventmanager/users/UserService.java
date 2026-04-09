@@ -1,8 +1,6 @@
 package dev.sorokin.eventmanager.users;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,17 +37,18 @@ public class UserService {
     public User findByLogin(String login) {
 
         var user = userRepository.findByLogin(login)
-                .orElseThrow(()-> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return mapToDomain(user);
     }
 
-    public User findById(Long id){
-        var user = userRepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("User not found"));
+    public User findById(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return mapToDomain(user);
     }
+
 
     private static User mapToDomain(UserEntity entity) {
         return new User(
@@ -61,6 +60,35 @@ public class UserService {
         );
     }
 
+    public boolean existByLogin(String admin) {
+        return userRepository.existsByLogin(admin);
+    }
+
+    public void createAdmin(String login, String password, Integer age) {
+
+        var adminToSave = new UserEntity(
+                null,
+                login,
+                password,
+                age,
+                UserRole.ADMIN
+        );
+        userRepository.save(adminToSave);
+
+    }
+
+    public void createDefaultUser(String login, String password, Integer age) {
+
+        var userToSave = new UserEntity(
+                null,
+                login,
+                password,
+                age,
+                UserRole.USER
+        );
+        userRepository.save(userToSave);
+
+    }
 }
 
 
