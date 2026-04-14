@@ -6,7 +6,7 @@ spring:
     name: event-manager
 
   datasource:
-    url: jdbc:postgresql://localhost:5431/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: root
 
@@ -30,5 +30,6 @@ springdoc:
     path: /swagger-ui/index.html
     url: /event-manager-openapi.yaml
 
-
+jwt:
+  secretKey: Vw47liBU9qsTTOQVh26DSCMXO04XZyAQsRslmH3QlT6
 

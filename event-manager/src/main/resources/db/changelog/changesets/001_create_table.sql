@@ -7,3 +7,4 @@ create table locations
     name        varchar(255),
     primary key (id)
 )
+
