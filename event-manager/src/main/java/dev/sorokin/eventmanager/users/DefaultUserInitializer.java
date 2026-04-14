@@ -21,10 +21,11 @@ public class DefaultUserInitializer {
             return;
         }
 
-        userService.createDefaultUser(
+        userService.createUser(
                 "new-user",
                 passwordEncoder.encode("12345"),
-                21
+                21,
+                UserRole.USER
         );
     }
 }

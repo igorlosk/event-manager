@@ -7,20 +7,20 @@ import jakarta.persistence.*;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "login", unique = true)
-    String login;
+    private String login;
 
     @Column(name = "password_hash")
-    String passwordHash;
+    private String passwordHash;
 
     @Column(name = "age")
-    Integer age;
+    private Integer age;
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    UserRole role;
+    private UserRole role;
 
     public UserEntity() {
     }

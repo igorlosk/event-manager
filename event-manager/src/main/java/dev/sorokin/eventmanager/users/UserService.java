@@ -64,30 +64,15 @@ public class UserService {
         return userRepository.existsByLogin(admin);
     }
 
-    public void createAdmin(String login, String password, Integer age) {
-
-        var adminToSave = new UserEntity(
-                null,
-                login,
-                password,
-                age,
-                UserRole.ADMIN
-        );
-        userRepository.save(adminToSave);
-
-    }
-
-    public void createDefaultUser(String login, String password, Integer age) {
-
+    public void createUser(String login, String password, Integer age, UserRole role){
         var userToSave = new UserEntity(
                 null,
                 login,
                 password,
                 age,
-                UserRole.USER
+                role
         );
         userRepository.save(userToSave);
-
     }
 }
 

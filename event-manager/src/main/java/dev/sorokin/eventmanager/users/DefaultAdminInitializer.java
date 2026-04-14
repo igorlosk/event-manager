@@ -21,10 +21,12 @@ public class DefaultAdminInitializer {
         if (userService.existByLogin("admin")) {
             return;
         }
-        userService.createAdmin(
+
+        userService.createUser(
                 "admin",
                 passwordEncoder.encode("admin"),
-                30
+                30,
+                UserRole.ADMIN
         );
     }
 }
