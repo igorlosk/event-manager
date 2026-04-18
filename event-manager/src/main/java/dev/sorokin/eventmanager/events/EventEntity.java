@@ -22,9 +22,6 @@ public class EventEntity {
     @Column(name = "max_places")
     private Integer maxPlaces;
 
-    @Column (name = "occupied_places")
-    private Integer occupiedPlaces;
-
     @Column(name = "start_at")
     private LocalDateTime date;
 
@@ -35,7 +32,7 @@ public class EventEntity {
     private Integer duration;
 
     @Column(name = "location_id")
-    private Long locationId;
+    private Integer locationId;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -51,7 +48,7 @@ public class EventEntity {
     public EventEntity() {
     }
 
-    public EventEntity(Long id, String name, Integer maxPlaces, LocalDateTime date, Integer cost, Integer duration, Long locationId, EventStatus status, List<RegistrationEntity> registrations) {
+    public EventEntity(Long id, String name, Integer maxPlaces, LocalDateTime date, Integer cost, Integer duration, Integer locationId, EventStatus status, List<RegistrationEntity> registrations) {
         this.id = id;
         this.name = name;
         this.maxPlaces = maxPlaces;
@@ -111,11 +108,11 @@ public class EventEntity {
         this.duration = duration;
     }
 
-    public Long getLocationId() {
+    public Integer getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(Long locationId) {
+    public void setLocationId(Integer locationId) {
         this.locationId = locationId;
     }
 

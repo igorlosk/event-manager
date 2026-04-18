@@ -18,11 +18,11 @@ public class LocationEntityConverter {
 
     public Location toDomain(LocationEntity locationEntity) {
         return new Location(
-                locationEntity.id,
-                locationEntity.name,
-                locationEntity.address,
-                locationEntity.capacity,
-                locationEntity.description
+                locationEntity.getId(),
+                locationEntity.getName(),
+                locationEntity.getAddress(),
+                locationEntity.getCapacity(),
+                locationEntity.getDescription()
         );
     }
 

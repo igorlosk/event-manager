@@ -7,15 +7,15 @@ import jakarta.persistence.*;
 public class LocationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
     @Column(name = "name")
-    String name;
+    private String name;
     @Column(name = "address")
-    String address;
+    private String address;
     @Column(name = "capacity")
-    Integer capacity;
+    private Integer capacity;
     @Column(name = "description")
-    String description;
+    private String description;
 
     public LocationEntity() {
     }

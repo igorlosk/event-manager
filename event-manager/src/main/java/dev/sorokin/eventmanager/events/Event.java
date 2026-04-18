@@ -1,11 +1,11 @@
 package dev.sorokin.eventmanager.events;
 
-import dev.sorokin.eventmanager.registration.RegistrationDto;
+import dev.sorokin.eventmanager.registration.Registration;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record EventCreateRequestDto(
+public record Event(
         Long id,
         String name,
         Integer maxPlaces,
@@ -14,6 +14,7 @@ public record EventCreateRequestDto(
         Integer duration,
         Integer locationId,
         EventStatus status,
-        List<RegistrationDto> registrations
+        List<Registration> registrations
+
 ) {
 }
