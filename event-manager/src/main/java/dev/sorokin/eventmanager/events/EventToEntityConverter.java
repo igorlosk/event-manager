@@ -18,7 +18,9 @@ public class EventToEntityConverter {
         return new Event(
                 entity.getId(),
                 entity.getName(),
+                entity.getOwnerId(),
                 entity.getMaxPlaces(),
+                entity.getOccupiedPlaces(),
                 entity.getDate(),
                 entity.getCost(),
                 entity.getDuration(),
@@ -36,7 +38,9 @@ public class EventToEntityConverter {
         return new EventEntity(
                 event.id(),
                 event.name(),
+                event.ownerId(),
                 event.maxPlaces(),
+                event.occupiedPlaces(),
                 event.date(),
                 event.cost(),
                 event.duration(),

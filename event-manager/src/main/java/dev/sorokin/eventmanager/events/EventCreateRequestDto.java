@@ -1,19 +1,15 @@
 package dev.sorokin.eventmanager.events;
 
-import dev.sorokin.eventmanager.registration.RegistrationDto;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import jakarta.validation.constraints.Min;
 
 public record EventCreateRequestDto(
-        Long id,
         String name,
         Integer maxPlaces,
-        LocalDateTime date,
+        String date,
+        @Min(1)
         Integer cost,
+        @Min(30)
         Integer duration,
-        Integer locationId,
-        EventStatus status,
-        List<RegistrationDto> registrations
+        Integer locationId
 ) {
 }

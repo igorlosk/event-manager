@@ -1,6 +1,6 @@
 package dev.sorokin.eventmanager.users;
 
-import dev.sorokin.eventmanager.security.jwt.JwtAuthenticationService;
+import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.*;
 import org.springframework.http.*;
@@ -14,13 +14,13 @@ public class UsersController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
 
-    private final JwtAuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     private final UserToDtoMapper userToDtoMapper;
 
     public UsersController(
             UserService userService,
-            JwtAuthenticationService authenticationService,
+            AuthenticationService authenticationService,
             UserToDtoMapper userToDtoMapper) {
         this.userService = userService;
         this.authenticationService = authenticationService;

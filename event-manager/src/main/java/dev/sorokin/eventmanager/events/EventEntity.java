@@ -19,8 +19,14 @@ public class EventEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "ownerId")
+    private Integer ownerId;
+
     @Column(name = "max_places")
     private Integer maxPlaces;
+
+    @Column(name = "occupied_places")
+    private Integer occupiedPlaces;
 
     @Column(name = "start_at")
     private LocalDateTime date;
@@ -48,10 +54,12 @@ public class EventEntity {
     public EventEntity() {
     }
 
-    public EventEntity(Long id, String name, Integer maxPlaces, LocalDateTime date, Integer cost, Integer duration, Integer locationId, EventStatus status, List<RegistrationEntity> registrations) {
+    public EventEntity(Long id, String name, Integer ownerId, Integer maxPlaces, Integer occupiedPlaces, LocalDateTime date, Integer cost, Integer duration, Integer locationId, EventStatus status, List<RegistrationEntity> registrations) {
         this.id = id;
         this.name = name;
+        this.ownerId = ownerId;
         this.maxPlaces = maxPlaces;
+        this.occupiedPlaces = occupiedPlaces;
         this.date = date;
         this.cost = cost;
         this.duration = duration;
@@ -76,12 +84,28 @@ public class EventEntity {
         this.name = name;
     }
 
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public Integer getMaxPlaces() {
         return maxPlaces;
     }
 
     public void setMaxPlaces(Integer maxPlaces) {
         this.maxPlaces = maxPlaces;
+    }
+
+    public Integer getOccupiedPlaces() {
+        return occupiedPlaces;
+    }
+
+    public void setOccupiedPlaces(Integer occupiedPlaces) {
+        this.occupiedPlaces = occupiedPlaces;
     }
 
     public LocalDateTime getDate() {
