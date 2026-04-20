@@ -1,6 +1,8 @@
 package dev.sorokin.eventmanager.events;
 
 import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +31,7 @@ public class EventController {
     @PostMapping
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<EventCreateRequestDto> eventCreate (
-            @RequestBody EventCreateRequestDto eventCreateRequestDto
+            @RequestBody @Valid EventCreateRequestDto eventCreateRequestDto
     ){
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
 

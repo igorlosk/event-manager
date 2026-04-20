@@ -8,7 +8,7 @@ public class RegistrationToDtoConverter {
     public Registration toDomain(RegistrationDto registrationDto){
         return new Registration(
                 registrationDto.id(),
-                registrationDto.event(),
+                registrationDto.event_id(),
                 registrationDto.userId(),
                 registrationDto.created()
         );
@@ -17,7 +17,7 @@ public class RegistrationToDtoConverter {
     public RegistrationDto toDto(Registration registration){
         return new RegistrationDto(
                 registration.id(),
-                registration.event(),
+                registration.event_id(),
                 registration.userId(),
                 registration.created()
         );
