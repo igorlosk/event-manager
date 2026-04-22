@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.events;
 
+import dev.sorokin.eventmanager.registration.Registration;
 import dev.sorokin.eventmanager.registration.RegistrationEntity;
 import jakarta.persistence.*;
 
@@ -19,7 +20,7 @@ public class EventEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "ownerId")
+    @Column(name = "owner_id")
     private Integer ownerId;
 
     @Column(name = "max_places")
@@ -52,6 +53,10 @@ public class EventEntity {
     private List<RegistrationEntity> registrations = new ArrayList<>();
 
     public EventEntity() {
+    }
+
+    public void addRegistrationToEvent(RegistrationEntity registration){
+        registrations.add(registration);
     }
 
     public EventEntity(Long id, String name, Integer ownerId, Integer maxPlaces, Integer occupiedPlaces, LocalDateTime date, Integer cost, Integer duration, Integer locationId, EventStatus status, List<RegistrationEntity> registrations) {

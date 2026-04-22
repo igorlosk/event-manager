@@ -2,7 +2,6 @@ package dev.sorokin.eventmanager.events;
 
 import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,13 +17,13 @@ public class EventController {
     private final EventToDtoConverter eventToDtoConverter;
     private final EventService eventService;
     private final AuthenticationService authenticationService;
-    private final RequestDtoToDtoConverter requestDtoToDtoConverter;
+    private final RequestDtoToEventDtoConverter requestDtoToEventDtoConverter;
 
-    public EventController(EventToDtoConverter eventToDtoConverter, EventService eventService, AuthenticationService authenticationService, RequestDtoToDtoConverter requestDtoToDtoConverter) {
+    public EventController(EventToDtoConverter eventToDtoConverter, EventService eventService, AuthenticationService authenticationService, RequestDtoToEventDtoConverter requestDtoToEventDtoConverter) {
         this.eventToDtoConverter = eventToDtoConverter;
         this.eventService = eventService;
         this.authenticationService = authenticationService;
-        this.requestDtoToDtoConverter = requestDtoToDtoConverter;
+        this.requestDtoToEventDtoConverter = requestDtoToEventDtoConverter;
     }
 
 
@@ -35,7 +34,7 @@ public class EventController {
     ){
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
 
-        EventDto eventDto = requestDtoToDtoConverter.toEventDto(eventCreateRequestDto);
+        EventDto eventDto = requestDtoToEventDtoConverter.toEventDto(eventCreateRequestDto);
 
         Event createdEvent = eventService
                 .createEvent(eventToDtoConverter.toDomain(eventDto), authUser);
@@ -43,6 +42,6 @@ public class EventController {
         EventDto responseDto = eventToDtoConverter.toDto(createdEvent);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(requestDtoToDtoConverter.toEventCreateRequestDto(responseDto));
+                .body(requestDtoToEventDtoConverter.toEventCreateRequestDto(responseDto));
     }
 }

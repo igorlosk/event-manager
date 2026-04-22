@@ -62,8 +62,4 @@ public class EventService {
         return toEntityConverter.toDomain(eventEntity);
     }
 
-    public void occupiedPlacesRefresh(Long eventId) {
-        EventEntity updateEvent = toEntityConverter.toEntity(findEventById(eventId));
-
-    }
 }

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record Registration(
         Long id,
-        Long event_id,
+        EventEntity event,
         Long userId,
         LocalDateTime created
 ) {

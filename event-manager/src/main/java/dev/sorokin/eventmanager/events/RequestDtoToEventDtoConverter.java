@@ -8,7 +8,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 @Component
-public class RequestDtoToDtoConverter {
+public class RequestDtoToEventDtoConverter {
 
 
     public EventDto toEventDto(EventCreateRequestDto eventCreateRequestDto) {

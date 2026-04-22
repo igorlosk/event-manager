@@ -1,8 +1,6 @@
 package dev.sorokin.eventmanager.registration;
 
-import dev.sorokin.eventmanager.events.Event;
-import dev.sorokin.eventmanager.events.EventService;
-import dev.sorokin.eventmanager.events.EventStatus;
+import dev.sorokin.eventmanager.events.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,32 +10,43 @@ import java.time.LocalDateTime;
 public class RegistrationService {
 
     private final EventService eventService;
+    private final RegistrationToEntityConverter toEntityConverter;
+    private final EventToEntityConverter eventToEntityConverter;
+    private final EventRepository eventRepository;
 
-    public RegistrationService(EventService eventService) {
+    public RegistrationService(EventService eventService, RegistrationToEntityConverter toEntityConverter, EventToEntityConverter eventToEntityConverter, EventRepository eventRepository) {
         this.eventService = eventService;
+        this.toEntityConverter = toEntityConverter;
+        this.eventToEntityConverter = eventToEntityConverter;
+        this.eventRepository = eventRepository;
     }
 
     @Transactional
     public void register(Long userId, Long eventId) {
 
-        Event event = eventService.findEventById(eventId);
+        Event eventById = eventService.findEventById(eventId);
+        EventEntity eventEntity = eventToEntityConverter.toEntity(eventById);
 
-        if (!(event.status() == EventStatus.WAIT_START)) {
+
+        if (!(eventById.status() == EventStatus.WAIT_START)) {
             throw new IllegalArgumentException("Registration is prohibited");
         }
 
-        if (event.occupiedPlaces() > event.registrations().size()) {
+        if (eventById.occupiedPlaces() > eventById.registrations().size()) {
             throw new IllegalArgumentException("Registration completed");
         }
 
         Registration registration = new Registration(
                 null,
-                event.id(),
+                eventEntity,
                 userId,
                 LocalDateTime.now()
         );
 
-        eventService.occupiedPlacesRefresh(eventId);
+        eventEntity.addRegistrationToEvent(toEntityConverter.toEntity(registration));
+
+        eventRepository.save(eventEntity);
+
 
 
         // найти событие
