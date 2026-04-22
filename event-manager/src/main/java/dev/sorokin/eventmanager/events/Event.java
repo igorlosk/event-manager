@@ -1,8 +1,6 @@
 package dev.sorokin.eventmanager.events;
 
 import dev.sorokin.eventmanager.registration.Registration;
-import dev.sorokin.eventmanager.registration.RegistrationDto;
-import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +17,7 @@ public record Event(
         Integer locationId,
         EventStatus status,
         List<Registration> registrations
-
 ) {
+
 }
+

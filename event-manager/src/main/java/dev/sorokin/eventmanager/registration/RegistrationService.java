@@ -1,10 +1,13 @@
 package dev.sorokin.eventmanager.registration;
 
 import dev.sorokin.eventmanager.events.*;
+import dev.sorokin.eventmanager.users.User;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class RegistrationService {
@@ -13,40 +16,37 @@ public class RegistrationService {
     private final RegistrationToEntityConverter toEntityConverter;
     private final EventToEntityConverter eventToEntityConverter;
     private final EventRepository eventRepository;
+    private final RegistrationToDtoConverter registrationToDtoConverter;
+    private final RegistrationRepository registrationRepository;
 
-    public RegistrationService(EventService eventService, RegistrationToEntityConverter toEntityConverter, EventToEntityConverter eventToEntityConverter, EventRepository eventRepository) {
+    public RegistrationService(EventService eventService, RegistrationToEntityConverter toEntityConverter, EventToEntityConverter eventToEntityConverter, EventRepository eventRepository, RegistrationToDtoConverter registrationToDtoConverter, RegistrationRepository registrationRepository) {
         this.eventService = eventService;
         this.toEntityConverter = toEntityConverter;
         this.eventToEntityConverter = eventToEntityConverter;
         this.eventRepository = eventRepository;
+        this.registrationToDtoConverter = registrationToDtoConverter;
+        this.registrationRepository = registrationRepository;
     }
 
     @Transactional
-    public void register(Long userId, Long eventId) {
+    public void registerToEvent(User user, Long eventId) {
 
-        Event eventById = eventService.findEventById(eventId);
-        EventEntity eventEntity = eventToEntityConverter.toEntity(eventById);
+        EventEntity eventEntity = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Not event found"));
 
-
-        if (!(eventById.status() == EventStatus.WAIT_START)) {
-            throw new IllegalArgumentException("Registration is prohibited");
-        }
-
-        if (eventById.occupiedPlaces() > eventById.registrations().size()) {
-            throw new IllegalArgumentException("Registration completed");
-        }
-
-        Registration registration = new Registration(
+        RegistrationEntity registration = new RegistrationEntity(
                 null,
-                eventEntity,
-                userId,
+                eventId,
+                user.id(),
                 LocalDateTime.now()
         );
 
-        eventEntity.addRegistrationToEvent(toEntityConverter.toEntity(registration));
+        registrationRepository.save(registration);
+
+
+        eventEntity.addRegistrationToEvent(registration);
 
         eventRepository.save(eventEntity);
-
 
 
         // найти событие

@@ -1,6 +1,5 @@
 package dev.sorokin.eventmanager.registration;
 
-import dev.sorokin.eventmanager.events.EventEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,9 +12,8 @@ public class RegistrationEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
-    private EventEntity event;
+    @Column(name = "event_id")
+    private Long eventId;
 
     @Column(name = "user_id")
     private Long userId;
@@ -26,9 +24,9 @@ public class RegistrationEntity {
     public RegistrationEntity() {
     }
 
-    public RegistrationEntity(Long id, EventEntity event, Long userId, LocalDateTime created) {
+    public RegistrationEntity(Long id, Long eventId, Long userId, LocalDateTime created) {
         this.id = id;
-        this.event = event;
+        this.eventId = eventId;
         this.userId = userId;
         this.created = created;
     }
@@ -41,12 +39,12 @@ public class RegistrationEntity {
         this.id = id;
     }
 
-    public EventEntity getEvent() {
-        return event;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setEvent(EventEntity event) {
-        this.event = event;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public Long getUserId() {

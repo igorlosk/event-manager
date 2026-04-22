@@ -45,17 +45,21 @@ public class EventEntity {
     @Enumerated(EnumType.STRING)
     private EventStatus status;
 
-    @OneToMany(
-            mappedBy = "event",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+//    @OneToMany(
+//            mappedBy = "event",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+//    private List<RegistrationEntity> registrations = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<RegistrationEntity> registrations = new ArrayList<>();
 
     public EventEntity() {
     }
 
-    public void addRegistrationToEvent(RegistrationEntity registration){
+    public void addRegistrationToEvent(RegistrationEntity registration) {
         registrations.add(registration);
     }
 

@@ -8,7 +8,7 @@ public class RegistrationToEntityConverter {
     public Registration toDomain(RegistrationEntity registrationEntity) {
         return new Registration(
                 registrationEntity.getId(),
-                registrationEntity.getEvent(),
+                registrationEntity.getEventId(),
                 registrationEntity.getUserId(),
                 registrationEntity.getCreated()
         );
@@ -17,7 +17,7 @@ public class RegistrationToEntityConverter {
     public RegistrationEntity toEntity(Registration registration) {
         return new RegistrationEntity(
                 registration.id(),
-                registration.event(),
+                registration.eventId(),
                 registration.userId(),
                 registration.created()
         );
