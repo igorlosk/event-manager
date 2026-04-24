@@ -10,6 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "events")
+@NamedEntityGraph(
+        name = "events_by_user")
 public class EventEntity {
 
     @Id
@@ -45,22 +47,11 @@ public class EventEntity {
     @Enumerated(EnumType.STRING)
     private EventStatus status;
 
-//    @OneToMany(
-//            mappedBy = "event",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//    private List<RegistrationEntity> registrations = new ArrayList<>();
-
     @OneToMany
     @JoinColumn(name = "event_id", referencedColumnName = "id")
     private List<RegistrationEntity> registrations = new ArrayList<>();
 
     public EventEntity() {
-    }
-
-    public void addRegistrationToEvent(RegistrationEntity registration) {
-        registrations.add(registration);
     }
 
     public EventEntity(Long id, String name, Integer ownerId, Integer maxPlaces, Integer occupiedPlaces, LocalDateTime date, Integer cost, Integer duration, Integer locationId, EventStatus status, List<RegistrationEntity> registrations) {
