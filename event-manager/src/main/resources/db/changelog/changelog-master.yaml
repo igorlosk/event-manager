@@ -3,4 +3,6 @@ databaseChangeLog:
       file: db/changelog/changesets/001_create_table.sql
   - include:
       file: db/changelog/changesets/002_create_users_table.sql
+  - include:
+      file: db/changelog/changesets/003_create_event_register_table.sql
 
