@@ -78,7 +78,7 @@ public class EventService {
         return eventToEntityMapper.toDomain(savedEntity);
     }
 
-    public Event getEvenById(Long id) {
+    public Event getEventById(Long id) {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
         return eventToEntityMapper.toDomain(eventEntity);
@@ -114,7 +114,7 @@ public class EventService {
 
         LOGGER.info("Event with id {} successfully updated by user {}", eventId, authUser.id());
 
-        return getEvenById(eventId);
+        return getEventById(eventId);
     }
 
     @Transactional

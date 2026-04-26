@@ -1,6 +1,5 @@
 package dev.sorokin.eventmanager.event;
 
-import dev.sorokin.eventmanager.location.LocationController;
 import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -62,8 +61,8 @@ public class EventController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
-    public ResponseEntity<EventDto> getEvent(@PathVariable("id") long id) {
-        Event event = eventService.getEvenById(id);
+    public ResponseEntity<EventDto> getEvent(@PathVariable("id") Long id) {
+        Event event = eventService.getEventById(id);
         LOGGER.info("Retrieved event: {}", id);
         return ResponseEntity.ok(eventToDtoMapper.toDto(event));
     }
@@ -81,7 +80,7 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
-    public ResponseEntity<Void> deleteEvent(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long id) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         LOGGER.info("Deleting event: {}", id);
         eventService.deleteEvent(id, authUser);
