@@ -14,7 +14,7 @@ public class EventPermissionService {
             Event event
     ) {
         Long userId = currentUser.id();
-        Long eventId = Long.valueOf(event.id());
+        Long eventId = Long.valueOf(event.ownerId());
 
         return Objects.equals(userId, eventId) || currentUser.role() == UserRole.ADMIN;
     }

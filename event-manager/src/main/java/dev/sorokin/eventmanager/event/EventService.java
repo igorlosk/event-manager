@@ -69,15 +69,24 @@ public class EventService {
         return eventToEntityMapper.toDomain(savedEntity);
     }
 
-    public Event getEvenById(long id) {
+    public Event getEvenById(Long id) {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
         return eventToEntityMapper.toDomain(eventEntity);
     }
 
+    @Transactional
     public Event updateEvent(EventDto eventDto, User authUser, Long eventId) {
-        if (!eventRepository.existsById(eventId)) {
-            throw new EntityNotFoundException("Event does not exists by id=%s".formatted(eventId));
+
+        EventEntity eventEntity = eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    LOGGER.warn("Attempt to update non-existent event with id: {}", eventId);
+                    return new EntityNotFoundException("Event with id " + eventId + " not found");
+                });
+
+        if (!eventPermissionService.canModify(authUser, eventToEntityMapper.toDomain(eventEntity))) {
+            LOGGER.warn("User {} attempted to update event {} without permission", authUser.id(), eventId);
+            throw new AccessDeniedException("User does not have permission to update this event");
         }
 
         Event event = eventToDtoMapper.toDomain(eventDto);
@@ -94,11 +103,13 @@ public class EventService {
                 event.locationId()
         );
 
-        return getEvenById(id);
+        LOGGER.info("Event with id {} successfully updated by user {}", eventId, authUser.id());
+
+        return getEvenById(eventId);
     }
 
     @Transactional
-    public void deleteEvent(long id, User authUser) {
+    public void deleteEvent(Long id, User authUser) {
 
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> {
@@ -124,5 +135,6 @@ public class EventService {
                 .map(eventToEntityMapper::toDomain)
                 .toList();
     }
+
 }
 
