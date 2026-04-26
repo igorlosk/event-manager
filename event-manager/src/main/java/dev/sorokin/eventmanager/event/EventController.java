@@ -26,25 +26,35 @@ public class EventController {
 
     private final EventToDtoMapper eventToDtoMapper;
 
+    private final RequestDtoToEventDtoMapper requestDtoToEventDtoMapper;
 
-    public EventController(AuthenticationService authenticationService, EventService eventService, EventToDtoMapper eventToDtoMapper) {
+
+    public EventController(
+            AuthenticationService authenticationService,
+            EventService eventService,
+            EventToDtoMapper eventToDtoMapper,
+            RequestDtoToEventDtoMapper requestDtoToEventDtoMapper) {
         this.authenticationService = authenticationService;
         this.eventService = eventService;
         this.eventToDtoMapper = eventToDtoMapper;
+        this.requestDtoToEventDtoMapper = requestDtoToEventDtoMapper;
     }
 
 
     @PostMapping()
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<EventDto> createEvent(
-            @RequestBody EventDto eventDto
+    public ResponseEntity<EventCreateRequestDto> createEvent(
+            @RequestBody @Valid EventCreateRequestDto eventCreateRequestDto
     ) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
 
+        EventDto eventDto = requestDtoToEventDtoMapper.toEventDto(eventCreateRequestDto);
+
         Event eventToSave = eventService.createEvent(eventToDtoMapper.toDomain(eventDto), authUser);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(eventToDtoMapper.toDto(eventToSave));
+        LOGGER.info("Created event: {}", eventToSave);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(requestDtoToEventDtoMapper.toRequestDto(eventToDtoMapper.toDto(eventToSave)));
     }
-
 
 }

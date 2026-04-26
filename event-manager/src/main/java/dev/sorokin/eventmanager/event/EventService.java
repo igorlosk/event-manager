@@ -16,7 +16,10 @@ public class EventService {
     private final EventToEntityMapper eventToEntityMapper;
     private final LocationService locationService;
 
-    public EventService(EventRepository eventRepository, EventToEntityMapper eventToEntityMapper, LocationService locationService) {
+    public EventService(
+            EventRepository eventRepository,
+            EventToEntityMapper eventToEntityMapper,
+            LocationService locationService) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
@@ -26,7 +29,17 @@ public class EventService {
     @Transactional
     public Event createEvent(Event event, User user) {
 
+        if (event.date().isBefore(LocalDateTime.now())){
+            throw new IllegalArgumentException("Date cannot be before now");
+        }
+
         Location location = locationService.getLocationById(event.locationId());
+
+        if (location.capacity() < event.maxPlaces()){
+            throw new IllegalArgumentException("The capacity of the location should not be " +
+                    "less than the number of event participants");
+        }
+
         Integer userId = Math.toIntExact(user.id());
 
         Event newEvent = new Event(
