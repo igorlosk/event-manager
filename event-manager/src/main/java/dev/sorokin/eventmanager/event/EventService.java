@@ -3,6 +3,7 @@ package dev.sorokin.eventmanager.event;
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
 import dev.sorokin.eventmanager.users.User;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +59,11 @@ public class EventService {
         );
         EventEntity savedEntity = eventRepository.save(eventToEntityMapper.toEntity(newEvent));
         return eventToEntityMapper.toDomain(savedEntity);
+    }
+
+    public Event getEvenById(long id) {
+        EventEntity eventEntity = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
+        return eventToEntityMapper.toDomain(eventEntity);
     }
 }

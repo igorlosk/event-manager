@@ -18,7 +18,7 @@ public record EventDto(
         @Min(30)
         Integer duration,
         Integer locationId,
-        EventStatus status,
-        List<RegistrationDto> registrations
+        EventStatus status
+//        List<RegistrationDto> registrations
 ) {
 }

@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -33,7 +30,8 @@ public class EventController {
             AuthenticationService authenticationService,
             EventService eventService,
             EventToDtoMapper eventToDtoMapper,
-            RequestDtoToEventDtoMapper requestDtoToEventDtoMapper) {
+            RequestDtoToEventDtoMapper requestDtoToEventDtoMapper,
+            UpdateDtoToEventDtoMapper responseDtoToEventDtoMapper) {
         this.authenticationService = authenticationService;
         this.eventService = eventService;
         this.eventToDtoMapper = eventToDtoMapper;
@@ -55,6 +53,14 @@ public class EventController {
         LOGGER.info("Created event: {}", eventToSave);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(requestDtoToEventDtoMapper.toRequestDto(eventToDtoMapper.toDto(eventToSave)));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    public ResponseEntity<EventDto> getEvent(@PathVariable("id") long id) {
+        Event event = eventService.getEvenById(id);
+        LOGGER.info("Retrieved event: {}", id);
+        return ResponseEntity.ok(eventToDtoMapper.toDto(event));
     }
 
 }

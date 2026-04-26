@@ -29,9 +29,8 @@ public class RequestDtoToEventDtoMapper {
                 eventCreateRequestDto.cost(),
                 eventCreateRequestDto.duration(),
                 eventCreateRequestDto.locationId(),
-                null,
-                List.of()
-                );
+                null
+        );
     }
 
 }

@@ -32,20 +32,13 @@ public class EventToDtoMapper {
                 event.cost(),
                 event.duration(),
                 event.locationId(),
-                event.status(),
-                event.registrations() == null ? List.of() :
-                        event.registrations()
-                                .stream()
-                                .map(registrationToDtoMapper::toDto)
-                                .toList()
+                event.status()
         );
     }
 
     public Event toDomain(EventDto eventDto) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
         OffsetDateTime odt = OffsetDateTime.parse(eventDto.date(), formatter);
 
@@ -62,11 +55,7 @@ public class EventToDtoMapper {
                 eventDto.duration(),
                 eventDto.locationId(),
                 eventDto.status(),
-                eventDto.registrations() == null ? List.of() :
-                        eventDto.registrations()
-                                .stream()
-                                .map(registrationToDtoMapper::toDomain)
-                                .toList()
+                null
         );
     }
 }
