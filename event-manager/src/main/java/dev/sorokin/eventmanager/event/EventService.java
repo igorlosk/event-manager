@@ -5,6 +5,9 @@ import dev.sorokin.eventmanager.location.LocationService;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,19 +17,23 @@ import java.util.List;
 @Service
 public class EventService {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(EventService.class);
     private final EventRepository eventRepository;
     private final EventToEntityMapper eventToEntityMapper;
     private final LocationService locationService;
     private final EventToDtoMapper eventToDtoMapper;
+    private final EventPermissionService eventPermissionService;
 
     public EventService(
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
-            LocationService locationService, EventToDtoMapper eventToDtoMapper) {
+            LocationService locationService, EventToDtoMapper eventToDtoMapper,
+            EventPermissionService eventPermissionService) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventToDtoMapper = eventToDtoMapper;
+        this.eventPermissionService = eventPermissionService;
     }
 
     public Event createEvent(Event event, User user) {
@@ -90,11 +97,22 @@ public class EventService {
         return getEvenById(id);
     }
 
+    @Transactional
     public void deleteEvent(long id, User authUser) {
 
         EventEntity eventEntity = eventRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
+                .orElseThrow(() -> {
+                    LOGGER.warn("Attempt to delete non-existent event with id: {}", id);
+                    return new EntityNotFoundException("Event with id " + id + " not found");
+                });
+
+        if (!eventPermissionService.canModify(authUser, eventToEntityMapper.toDomain(eventEntity))) {
+            LOGGER.warn("User {} attempted to delete event {} without permission", authUser.id(), id);
+            throw new AccessDeniedException("User does not have permission to delete this event");
+        }
+
         eventRepository.delete(eventEntity);
+        LOGGER.info("Event with id {} successfully deleted by user {}", id, authUser.id());
     }
 
     public List<Event> getAllMyEvents(User authUser) {
