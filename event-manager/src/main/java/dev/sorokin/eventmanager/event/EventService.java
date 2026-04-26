@@ -36,17 +36,24 @@ public class EventService {
         this.eventPermissionService = eventPermissionService;
     }
 
+    @Transactional
     public Event createEvent(Event event, User user) {
 
         if (event.date().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Date cannot be before now");
+            LOGGER.warn("Attempt to create event with past date: {} for user: {}", event.date(), user.id());
+            throw new IllegalArgumentException("Date cannot be before now. Provided date: " + event.date());
         }
 
         Location location = locationService.getLocationById(event.locationId());
 
         if (location.capacity() < event.maxPlaces()) {
-            throw new IllegalArgumentException("The capacity of the location should not be " +
-                    "less than the number of event participants");
+            LOGGER.warn("Location {} capacity {} is less than maxPlaces {} for event by user {}",
+                    location.id(), location.capacity(), event.maxPlaces(), user.id());
+            throw new IllegalArgumentException(
+                    "The capacity of the location (" + location.capacity() +
+                            ") should not be less than the number of event participants (" +
+                            event.maxPlaces() + ")"
+            );
         }
 
         Integer userId = Math.toIntExact(user.id());
@@ -65,7 +72,9 @@ public class EventService {
                 List.of()
 
         );
+
         EventEntity savedEntity = eventRepository.save(eventToEntityMapper.toEntity(newEvent));
+        LOGGER.info("Event with id {} created successfully by user {}", savedEntity.getId(), userId);
         return eventToEntityMapper.toDomain(savedEntity);
     }
 
