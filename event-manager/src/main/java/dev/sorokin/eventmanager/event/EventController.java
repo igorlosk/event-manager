@@ -75,7 +75,15 @@ public class EventController {
         LOGGER.info("Updating event: {}", id);
         Event event = eventService.updateEvent(updateDtoToEventDtoMapper.toEventDto(eventUpdateRequestDto), authUser, id);
         return ResponseEntity.ok(updateDtoToEventDtoMapper.toUpdateDto(eventToDtoMapper.toDto(event)));
+    }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    public ResponseEntity<Void> deleteEvent(@PathVariable("id") long id) {
+        var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        LOGGER.info("Deleting event: {}", id);
+        eventService.deleteEvent(id, authUser);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

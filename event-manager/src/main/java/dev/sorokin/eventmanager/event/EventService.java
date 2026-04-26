@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class EventService {
@@ -29,8 +29,6 @@ public class EventService {
         this.eventToDtoMapper = eventToDtoMapper;
     }
 
-
-    @Transactional
     public Event createEvent(Event event, User user) {
 
         if (event.date().isBefore(LocalDateTime.now())) {
@@ -71,32 +69,32 @@ public class EventService {
     }
 
     public Event updateEvent(EventDto eventDto, User authUser, Long eventId) {
-
-        EventEntity eventEntity = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("No event with id " + eventId));
+        if (!eventRepository.existsById(eventId)) {
+            throw new EntityNotFoundException("Event does not exists by id=%s".formatted(eventId));
+        }
 
         Event event = eventToDtoMapper.toDomain(eventDto);
 
         Integer id = Math.toIntExact(eventId);
 
-        EventEntity evenToUpdate = new EventEntity(
+        eventRepository.updateLocation(
                 id,
                 event.name(),
-                eventEntity.getOwnerId(),
                 event.maxPlaces(),
-                eventEntity.getOccupiedPlaces(),
                 event.date(),
                 event.cost(),
                 event.duration(),
-                event.locationId(),
-                eventEntity.getStatus(),
-                eventEntity.getRegistrations()
+                event.locationId()
         );
 
-        eventRepository.save(evenToUpdate);
+        return getEvenById(id);
+    }
 
-        return eventToEntityMapper.toDomain(evenToUpdate);
+    public void deleteEvent(long id, User authUser) {
 
+        EventEntity eventEntity = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
+        eventRepository.delete(eventEntity);
     }
 }
 
