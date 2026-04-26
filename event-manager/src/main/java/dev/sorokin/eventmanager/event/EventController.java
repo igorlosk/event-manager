@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/events")
 public class EventController {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(LocationController.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(EventController.class);
 
     private final AuthenticationService authenticationService;
 
@@ -25,17 +25,20 @@ public class EventController {
 
     private final RequestDtoToEventDtoMapper requestDtoToEventDtoMapper;
 
+    private final UpdateDtoToEventDtoMapper updateDtoToEventDtoMapper;
+
 
     public EventController(
             AuthenticationService authenticationService,
             EventService eventService,
             EventToDtoMapper eventToDtoMapper,
             RequestDtoToEventDtoMapper requestDtoToEventDtoMapper,
-            UpdateDtoToEventDtoMapper responseDtoToEventDtoMapper) {
+            UpdateDtoToEventDtoMapper updateDtoToEventDtoMapper) {
         this.authenticationService = authenticationService;
         this.eventService = eventService;
         this.eventToDtoMapper = eventToDtoMapper;
         this.requestDtoToEventDtoMapper = requestDtoToEventDtoMapper;
+        this.updateDtoToEventDtoMapper = updateDtoToEventDtoMapper;
     }
 
 
@@ -61,6 +64,18 @@ public class EventController {
         Event event = eventService.getEvenById(id);
         LOGGER.info("Retrieved event: {}", id);
         return ResponseEntity.ok(eventToDtoMapper.toDto(event));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    public ResponseEntity<EventUpdateRequestDto> updateEvent(
+            @PathVariable("id") Long id,
+            @RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto) {
+        var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        LOGGER.info("Updating event: {}", id);
+        Event event = eventService.updateEvent(updateDtoToEventDtoMapper.toEventDto(eventUpdateRequestDto), authUser, id);
+        return ResponseEntity.ok(updateDtoToEventDtoMapper.toUpdateDto(eventToDtoMapper.toDto(event)));
+
     }
 
 }
