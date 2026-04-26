@@ -11,6 +11,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -143,6 +145,34 @@ public class EventService {
                 .stream()
                 .map(eventToEntityMapper::toDomain)
                 .toList();
+    }
+
+    public List<Event> searchFilter(EventSearchRequestDto eventSearchRequestDto) {
+
+        Long locationId = Long.valueOf(eventSearchRequestDto.locationId());
+
+        ZonedDateTime zonedDateTimeAfter = ZonedDateTime.parse(eventSearchRequestDto.dateStartAfter());
+        LocalDateTime localDateTimeAfter = zonedDateTimeAfter.toLocalDateTime();
+
+        ZonedDateTime zonedDateTimeBefore = ZonedDateTime.parse(eventSearchRequestDto.dateStartBefore());
+        LocalDateTime localDateTimeBefore = zonedDateTimeBefore.toLocalDateTime();
+
+        List<Event> list = eventRepository.search(
+                eventSearchRequestDto.name(),
+                eventSearchRequestDto.placesMin(),
+                eventSearchRequestDto.placesMax(),
+                localDateTimeAfter,
+                localDateTimeBefore,
+                eventSearchRequestDto.costMin(),
+                eventSearchRequestDto.costMax(),
+                eventSearchRequestDto.durationMin(),
+                eventSearchRequestDto.durationMax(),
+                locationId,
+                eventSearchRequestDto.eventStatus()
+        ).stream().map(eventToEntityMapper::toDomain).toList();
+
+        return list;
+
     }
 
 }

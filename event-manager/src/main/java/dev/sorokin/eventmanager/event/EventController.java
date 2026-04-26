@@ -97,4 +97,10 @@ public class EventController {
                 .toList();
     }
 
+    @PostMapping("/search")
+    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    public List<EventDto> searchFilter(@RequestBody EventSearchRequestDto eventSearchRequestDto){
+        return eventService.searchFilter(eventSearchRequestDto).stream().map(eventToDtoMapper::toDto).toList();
+    }
+
 }
