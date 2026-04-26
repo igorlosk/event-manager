@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/events")
@@ -84,6 +86,16 @@ public class EventController {
         LOGGER.info("Deleting event: {}", id);
         eventService.deleteEvent(id, authUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasAuthority('USER')")
+    public List<EventDto> getMyEvent() {
+        var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        return eventService.getAllMyEvents(authUser)
+                .stream()
+                .map(eventToDtoMapper::toDto)
+                .toList();
     }
 
 }

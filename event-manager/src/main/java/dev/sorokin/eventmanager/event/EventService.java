@@ -96,5 +96,15 @@ public class EventService {
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
         eventRepository.delete(eventEntity);
     }
+
+    public List<Event> getAllMyEvents(User authUser) {
+
+        Integer userId = Math.toIntExact(authUser.id());
+
+        return eventRepository.findAllByOwnerId(userId)
+                .stream()
+                .map(eventToEntityMapper::toDomain)
+                .toList();
+    }
 }
 
