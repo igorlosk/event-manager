@@ -153,30 +153,24 @@ public class EventService {
     @Transactional()
     public List<Event> searchFilter(EventSearchRequestDto eventSearchRequestDto) {
 
-        if (eventSearchRequestDto == null) {
-            throw new IllegalArgumentException("EventSearchRequestDto не может быть null");
-        }
-
-        LocalDateTime localDateTime = null;
-        if (eventSearchRequestDto.dateStartAfter() != null && !eventSearchRequestDto.dateStartAfter().trim().isEmpty()) {
-            try {
-                localDateTime = dateTimeConverter.parseToLocalDateTime(eventSearchRequestDto.dateStartAfter());
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Неверный формат даты: " + eventSearchRequestDto.dateStartAfter(), e);
-            }
-        }
+        LocalDateTime dateTimeAfter = dateTimeConverter.parseToLocalDateTime(eventSearchRequestDto.dateStartAfter());
+        LocalDateTime dateTimeBefore = dateTimeConverter.parseToLocalDateTime(eventSearchRequestDto.dateStartBefore());
 
         List<Event> list = eventRepository.search(
                 eventSearchRequestDto.name(),
                 eventSearchRequestDto.placesMin(),
                 eventSearchRequestDto.placesMax(),
-                localDateTime
+                dateTimeAfter,
+                dateTimeBefore,
+                eventSearchRequestDto.costMin(),
+                eventSearchRequestDto.costMax(),
+                eventSearchRequestDto.durationMin(),
+                eventSearchRequestDto.durationMax(),
+                Long.valueOf(eventSearchRequestDto.locationId()),
+                eventSearchRequestDto.eventStatus()
         ).stream().map(eventToEntityMapper::toDomain).toList();
 
         return list != null ? list : Collections.emptyList();
-
     }
-
-
 }
 
