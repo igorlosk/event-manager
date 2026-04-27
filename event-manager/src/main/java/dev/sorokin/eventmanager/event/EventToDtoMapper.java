@@ -12,15 +12,16 @@ import java.util.List;
 public class EventToDtoMapper {
 
     private final RegistrationToDtoMapper registrationToDtoMapper;
+    private final DateTimeConverter dateTimeConverter;
 
-    public EventToDtoMapper(RegistrationToDtoMapper registrationToDtoMapper) {
+    public EventToDtoMapper(RegistrationToDtoMapper registrationToDtoMapper, DateTimeConverter dateTimeConverter) {
         this.registrationToDtoMapper = registrationToDtoMapper;
+        this.dateTimeConverter = dateTimeConverter;
     }
 
     public EventDto toDto(Event event) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        String dateTime = event.date().format(formatter);
+        String localDateTimeString = dateTimeConverter.formatToString(event.date());
 
         return new EventDto(
                 event.id(),
@@ -28,7 +29,7 @@ public class EventToDtoMapper {
                 event.ownerId(),
                 event.maxPlaces(),
                 event.occupiedPlaces(),
-                dateTime,
+                localDateTimeString,
                 event.cost(),
                 event.duration(),
                 event.locationId(),
@@ -38,11 +39,7 @@ public class EventToDtoMapper {
 
     public Event toDomain(EventDto eventDto) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
-        OffsetDateTime odt = OffsetDateTime.parse(eventDto.date(), formatter);
-
-        LocalDateTime dateTime = odt.toLocalDateTime();
+        LocalDateTime localDateTime = dateTimeConverter.parseToLocalDateTime(eventDto.date());
 
         return new Event(
                 eventDto.id(),
@@ -50,7 +47,7 @@ public class EventToDtoMapper {
                 eventDto.ownerId(),
                 eventDto.maxPlaces(),
                 eventDto.occupiedPlaces(),
-                dateTime,
+                localDateTime,
                 eventDto.cost(),
                 eventDto.duration(),
                 eventDto.locationId(),

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -25,17 +26,19 @@ public class EventService {
     private final LocationService locationService;
     private final EventToDtoMapper eventToDtoMapper;
     private final EventPermissionService eventPermissionService;
+    private final DateTimeConverter dateTimeConverter;
 
     public EventService(
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
             LocationService locationService, EventToDtoMapper eventToDtoMapper,
-            EventPermissionService eventPermissionService) {
+            EventPermissionService eventPermissionService, DateTimeConverter dateTimeConverter) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventToDtoMapper = eventToDtoMapper;
         this.eventPermissionService = eventPermissionService;
+        this.dateTimeConverter = dateTimeConverter;
     }
 
     @Transactional
@@ -147,33 +150,33 @@ public class EventService {
                 .toList();
     }
 
+    @Transactional()
     public List<Event> searchFilter(EventSearchRequestDto eventSearchRequestDto) {
 
-        Long locationId = Long.valueOf(eventSearchRequestDto.locationId());
+        if (eventSearchRequestDto == null) {
+            throw new IllegalArgumentException("EventSearchRequestDto не может быть null");
+        }
 
-        ZonedDateTime zonedDateTimeAfter = ZonedDateTime.parse(eventSearchRequestDto.dateStartAfter());
-        LocalDateTime localDateTimeAfter = zonedDateTimeAfter.toLocalDateTime();
-
-        ZonedDateTime zonedDateTimeBefore = ZonedDateTime.parse(eventSearchRequestDto.dateStartBefore());
-        LocalDateTime localDateTimeBefore = zonedDateTimeBefore.toLocalDateTime();
+        LocalDateTime localDateTime = null;
+        if (eventSearchRequestDto.dateStartAfter() != null && !eventSearchRequestDto.dateStartAfter().trim().isEmpty()) {
+            try {
+                localDateTime = dateTimeConverter.parseToLocalDateTime(eventSearchRequestDto.dateStartAfter());
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Неверный формат даты: " + eventSearchRequestDto.dateStartAfter(), e);
+            }
+        }
 
         List<Event> list = eventRepository.search(
                 eventSearchRequestDto.name(),
                 eventSearchRequestDto.placesMin(),
                 eventSearchRequestDto.placesMax(),
-                localDateTimeAfter,
-                localDateTimeBefore,
-                eventSearchRequestDto.costMin(),
-                eventSearchRequestDto.costMax(),
-                eventSearchRequestDto.durationMin(),
-                eventSearchRequestDto.durationMax(),
-                locationId,
-                eventSearchRequestDto.eventStatus()
+                localDateTime
         ).stream().map(eventToEntityMapper::toDomain).toList();
 
-        return list;
+        return list != null ? list : Collections.emptyList();
 
     }
+
 
 }
 
