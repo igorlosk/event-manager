@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,4 +71,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("locationId") Long locationId,
             @Param("eventStatus") EventStatus eventStatus
     );
+
+//    @Query("SELECT a FROM EventEntity a WHERE a.ownerId = :userId")
+//    @EntityGraph(value = "events_by_user")
+//    List<EventEntity> findAllEvents(@Param("user")Long userId);
 }

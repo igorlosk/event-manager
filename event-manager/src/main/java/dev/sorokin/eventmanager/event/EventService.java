@@ -2,6 +2,8 @@ package dev.sorokin.eventmanager.event;
 
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
+import dev.sorokin.eventmanager.registration.RegistrationEntity;
+import dev.sorokin.eventmanager.registration.RegistrationRepository;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -15,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -32,13 +35,15 @@ public class EventService {
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
             LocationService locationService, EventToDtoMapper eventToDtoMapper,
-            EventPermissionService eventPermissionService, DateTimeConverter dateTimeConverter) {
+            EventPermissionService eventPermissionService,
+            DateTimeConverter dateTimeConverter) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventToDtoMapper = eventToDtoMapper;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
+
     }
 
     @Transactional
@@ -172,5 +177,6 @@ public class EventService {
 
         return list != null ? list : Collections.emptyList();
     }
+
 }
 

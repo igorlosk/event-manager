@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.sorokin.eventmanager.registration.RegistrationEntity;
 import jakarta.persistence.*;
 
@@ -43,10 +44,8 @@ public class EventEntity {
     private EventStatus status;
 
 
-    @OneToMany
-            (mappedBy = "event",
-                    cascade = CascadeType.ALL,
-                    orphanRemoval = true)
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<RegistrationEntity> registrations;
 
     public EventEntity() {
