@@ -69,4 +69,31 @@ public class RegistrationService {
                 .toList();
 
     }
+
+    public void deleteRegistration(Long id, User userAuth) {
+
+        EventEntity eventToRegister = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Event with ID %d not found", id)));
+
+        if (eventToRegister.getStatus() != EventStatus.WAIT_START) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot delete event %d: status is %s",
+                            id, eventToRegister.getStatus()));
+        }
+
+        RegistrationEntity registrationEntity = registrationRepository
+                .findRegistrationEntitiesByUserIdAndEventId(userAuth.id(), eventToRegister.getId());
+
+        if (!registrationEntity.getUserId().equals(userAuth.id())) {
+            throw new SecurityException("Cannot delete another user's registration");
+        }
+
+        if (registrationEntity == null) {
+            throw new EntityNotFoundException("Registration not found");
+        }
+
+        registrationRepository.delete(registrationEntity);
+
+    }
 }

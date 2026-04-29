@@ -19,5 +19,8 @@ public interface RegistrationRepository extends JpaRepository<RegistrationEntity
 
     @Query("SELECT r FROM RegistrationEntity r JOIN FETCH r.event WHERE r.userId = :userId")
     List<RegistrationEntity> findAllByUserId(@Param("userId") Long userId);
-}
 
+
+    RegistrationEntity findRegistrationEntitiesByUserIdAndEventId(Long userId, Integer event_id);
+
+}

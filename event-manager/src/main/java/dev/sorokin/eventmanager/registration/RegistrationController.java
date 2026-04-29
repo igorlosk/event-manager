@@ -56,5 +56,15 @@ public class RegistrationController {
                 .toList();
     }
 
+    @DeleteMapping("/cancel/{id}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<Void> deleteRegistration(
+            @PathVariable("id") Long id
+    ){
+        var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        registrationService.deleteRegistration(id, authUser);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
 }

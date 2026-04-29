@@ -149,10 +149,10 @@ public class EventService {
 
         Integer userId = Math.toIntExact(authUser.id());
 
-        return eventRepository.findAllByOwnerId(userId)
-                .stream()
-                .map(eventToEntityMapper::toDomain)
-                .toList();
+            return eventRepository.findAllByOwnerId(userId)
+                    .stream()
+                    .map(eventToEntityMapper::toDomain)
+                    .toList();
     }
 
     @Transactional()
