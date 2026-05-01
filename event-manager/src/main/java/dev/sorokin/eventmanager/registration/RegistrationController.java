@@ -39,16 +39,15 @@ public class RegistrationController {
             @PathVariable("id") Long id
     ) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
-
         registrationService.registerToEvent(authUser, id);
-
+        LOGGER.info("User successfully registered to event {}", id);
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasAuthority('USER')")
-    List<RegistrationDto> getMyRegistEvent() {
+    List<RegistrationDto> getMyRegistrationEvent() {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         return registrationService.getAllMyEvents(authUser)
                 .stream()
@@ -60,9 +59,10 @@ public class RegistrationController {
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<Void> deleteRegistration(
             @PathVariable("id") Long id
-    ){
+    ) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         registrationService.deleteRegistration(id, authUser);
+        LOGGER.info("User deleted registration on eventId: {}", id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

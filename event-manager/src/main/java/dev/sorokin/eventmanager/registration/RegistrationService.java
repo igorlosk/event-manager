@@ -70,6 +70,7 @@ public class RegistrationService {
 
     }
 
+    @Transactional
     public void deleteRegistration(Long id, User userAuth) {
 
         EventEntity eventToRegister = eventRepository.findById(id)
@@ -84,10 +85,6 @@ public class RegistrationService {
 
         RegistrationEntity registrationEntity = registrationRepository
                 .findRegistrationEntitiesByUserIdAndEventId(userAuth.id(), eventToRegister.getId());
-
-        if (!registrationEntity.getUserId().equals(userAuth.id())) {
-            throw new SecurityException("Cannot delete another user's registration");
-        }
 
         if (registrationEntity == null) {
             throw new EntityNotFoundException("Registration not found");

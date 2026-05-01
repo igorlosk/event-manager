@@ -91,6 +91,7 @@ public class EventController {
     @PreAuthorize("hasAuthority('USER')")
     public List<EventDto> getMyEvent() {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        LOGGER.info("Get all events by userId: {}", authUser.id());
         return eventService.getAllMyEvents(authUser)
                 .stream()
                 .map(eventToDtoMapper::toDto)
@@ -100,7 +101,11 @@ public class EventController {
     @PostMapping("/search")
     @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
     public List<EventDto> searchFilter(@RequestBody @Valid EventSearchRequestDto eventSearchRequestDto){
-        return eventService.searchFilter(eventSearchRequestDto).stream().map(eventToDtoMapper::toDto).toList();
+        LOGGER.info("Get list events by search filter");
+        return eventService.searchFilter(eventSearchRequestDto)
+                .stream()
+                .map(eventToDtoMapper::toDto)
+                .toList();
     }
 
 }
