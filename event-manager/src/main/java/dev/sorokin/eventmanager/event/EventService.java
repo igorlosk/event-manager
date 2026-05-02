@@ -110,6 +110,19 @@ public class EventService {
             throw new AccessDeniedException("User does not have permission to update this event");
         }
 
+        LocalDateTime eventDtoDate = dateTimeConverter.parseToLocalDateTime(eventDto.date());
+        if (eventDtoDate.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException(
+                    String.format("The date can't be earlier than it is now %s", LocalDateTime.now()));
+        }
+
+        if (eventDto.maxPlaces() < eventEntity.getOccupiedPlaces()){
+            throw new IllegalArgumentException(
+                    String.format("MaxPlaces must be bigger or equals occupiedPlaces %d", eventEntity.getOccupiedPlaces()));
+        }
+
+        locationService.getLocationById(eventDto.locationId());
+
         eventRepository.updateEvent(
                 Math.toIntExact(eventId),
                 eventDto.name(),
@@ -117,7 +130,7 @@ public class EventService {
                 dateTimeConverter.parseToLocalDateTime(eventDto.date()),
                 eventDto.cost(),
                 eventDto.duration(),
-                eventDto.locationId()
+                Math.toIntExact(eventId)
 
         );
 
