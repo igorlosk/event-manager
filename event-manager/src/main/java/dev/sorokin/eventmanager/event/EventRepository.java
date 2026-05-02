@@ -30,7 +30,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
                WHERE event.id = :id
             
             """)
-    void updateLocation(
+    void updateEvent(
             @Param("id") Integer id,
             @Param("name") String name,
             @Param("maxPlaces") Integer maxPlaces,

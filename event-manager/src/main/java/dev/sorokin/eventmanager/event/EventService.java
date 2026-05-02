@@ -87,11 +87,10 @@ public class EventService {
     public Event getEventById(Long id) {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
-        LOGGER.info("Get event by id={}",id);
+        LOGGER.info("Get event by id={}", id);
         return eventToEntityMapper.toDomain(eventEntity);
     }
 
-    @Transactional
     public Event updateEvent(EventDto eventDto, User authUser, Long eventId) {
 
         EventEntity eventEntity = eventRepository.findById(eventId)
@@ -100,28 +99,31 @@ public class EventService {
                     return new EntityNotFoundException("Event with id " + eventId + " not found");
                 });
 
+        if (!eventEntity.getStatus().equals(EventStatus.WAIT_START)) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot update event %d: status is %s",
+                            eventId, eventEntity.getStatus()));
+        }
+
         if (!eventPermissionService.canModify(authUser, eventToEntityMapper.toDomain(eventEntity))) {
             LOGGER.warn("User {} attempted to update event {} without permission", authUser.id(), eventId);
             throw new AccessDeniedException("User does not have permission to update this event");
         }
 
-        Event event = eventToDtoMapper.toDomain(eventDto);
+        eventRepository.updateEvent(
+                Math.toIntExact(eventId),
+                eventDto.name(),
+                eventDto.maxPlaces(),
+                dateTimeConverter.parseToLocalDateTime(eventDto.date()),
+                eventDto.cost(),
+                eventDto.duration(),
+                eventDto.locationId()
 
-        Integer id = Math.toIntExact(eventId);
-
-        eventRepository.updateLocation(
-                id,
-                event.name(),
-                event.maxPlaces(),
-                event.date(),
-                event.cost(),
-                event.duration(),
-                event.locationId()
         );
 
+        EventEntity updatedEvent = eventRepository.findById(eventId).orElseThrow();
         LOGGER.info("Event with id {} successfully updated by user {}", eventId, authUser.id());
-
-        return getEventById(eventId);
+        return eventToEntityMapper.toDomain(updatedEvent);
     }
 
     @Transactional
@@ -132,6 +134,12 @@ public class EventService {
                     LOGGER.warn("Attempt to delete non-existent event with id: {}", id);
                     return new EntityNotFoundException("Event with id " + id + " not found");
                 });
+
+        if (!eventEntity.getStatus().equals(EventStatus.WAIT_START)) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot delete event %d: status is %s",
+                            id, eventEntity.getStatus()));
+        }
 
         if (!eventPermissionService.canModify(authUser, eventToEntityMapper.toDomain(eventEntity))) {
             LOGGER.warn("User {} attempted to delete event {} without permission", authUser.id(), id);

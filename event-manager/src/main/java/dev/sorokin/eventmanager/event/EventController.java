@@ -69,13 +69,13 @@ public class EventController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
-    public ResponseEntity<EventUpdateRequestDto> updateEvent(
+    public ResponseEntity<EventDto> updateEvent(
             @PathVariable("id") Long id,
             @RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         LOGGER.info("Updating event: {}", id);
         Event event = eventService.updateEvent(updateDtoToEventDtoMapper.toEventDto(eventUpdateRequestDto), authUser, id);
-        return ResponseEntity.ok(updateDtoToEventDtoMapper.toUpdateDto(eventToDtoMapper.toDto(event)));
+        return ResponseEntity.ok(eventToDtoMapper.toDto(event));
     }
 
     @DeleteMapping("/{id}")
