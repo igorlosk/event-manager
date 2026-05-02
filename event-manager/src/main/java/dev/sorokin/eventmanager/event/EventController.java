@@ -45,7 +45,7 @@ public class EventController {
 
     @PostMapping()
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<EventCreateRequestDto> createEvent(
+    public ResponseEntity<EventDto> createEvent(
             @RequestBody @Valid EventCreateRequestDto eventCreateRequestDto
     ) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
@@ -56,7 +56,7 @@ public class EventController {
 
         LOGGER.info("Created event: {}", eventToSave);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(requestDtoToEventDtoMapper.toRequestDto(eventToDtoMapper.toDto(eventToSave)));
+                .body(eventToDtoMapper.toDto(eventToSave));
     }
 
     @GetMapping("/{id}")
