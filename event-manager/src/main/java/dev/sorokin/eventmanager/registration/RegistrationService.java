@@ -42,7 +42,6 @@ public class RegistrationService {
                             authUser.id(), eventId));
         }
 
-
         if (eventToRegister.getStatus() != EventStatus.WAIT_START) {
             throw new IllegalArgumentException(
                     String.format("Cannot register to event %d: status is %s",
@@ -66,7 +65,6 @@ public class RegistrationService {
         );
 
         registrationRepository.save(registrationEntity);
-
     }
 
     public List<Registration> getAllMyEvents(User authUser) {
@@ -74,7 +72,6 @@ public class RegistrationService {
                 .stream()
                 .map(registrationToEntityMapper::toDomain)
                 .toList();
-
     }
 
     @Transactional
@@ -98,6 +95,5 @@ public class RegistrationService {
         }
 
         registrationRepository.delete(registrationEntity);
-
     }
 }

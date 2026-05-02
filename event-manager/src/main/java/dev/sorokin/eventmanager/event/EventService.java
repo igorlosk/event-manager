@@ -23,20 +23,18 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventToEntityMapper eventToEntityMapper;
     private final LocationService locationService;
-    private final EventToDtoMapper eventToDtoMapper;
     private final EventPermissionService eventPermissionService;
     private final DateTimeConverter dateTimeConverter;
 
     public EventService(
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
-            LocationService locationService, EventToDtoMapper eventToDtoMapper,
+            LocationService locationService,
             EventPermissionService eventPermissionService,
             DateTimeConverter dateTimeConverter) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
-        this.eventToDtoMapper = eventToDtoMapper;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
 
@@ -116,7 +114,7 @@ public class EventService {
                     String.format("The date can't be earlier than it is now %s", LocalDateTime.now()));
         }
 
-        if (eventDto.maxPlaces() < eventEntity.getOccupiedPlaces()){
+        if (eventDto.maxPlaces() < eventEntity.getOccupiedPlaces()) {
             throw new IllegalArgumentException(
                     String.format("MaxPlaces must be bigger or equals occupiedPlaces %d", eventEntity.getOccupiedPlaces()));
         }
@@ -213,9 +211,6 @@ public class EventService {
             finished.forEach(id -> eventRepository.changeStatus(id, EventStatus.FINISHED));
             LOGGER.info("Updated {} events to FINISHED", started.size());
         }
-
     }
-
-
 }
 

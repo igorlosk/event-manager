@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
-
     @EntityGraph(attributePaths = "registrations")
     Optional<EventEntity> findById(Long id);
 

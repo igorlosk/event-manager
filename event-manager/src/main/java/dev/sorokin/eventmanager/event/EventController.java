@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/events")
 public class EventController {
@@ -41,7 +40,6 @@ public class EventController {
         this.requestDtoToEventDtoMapper = requestDtoToEventDtoMapper;
         this.updateDtoToEventDtoMapper = updateDtoToEventDtoMapper;
     }
-
 
     @PostMapping()
     @PreAuthorize("hasAuthority('USER')")
@@ -107,5 +105,4 @@ public class EventController {
                 .map(eventToDtoMapper::toDto)
                 .toList();
     }
-
 }

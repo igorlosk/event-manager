@@ -66,6 +66,4 @@ public class RegistrationController {
         LOGGER.info("User deleted registration on eventId: {}", id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-
 }
