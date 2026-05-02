@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +71,15 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("eventStatus") EventStatus eventStatus
     );
 
-//    @Query("SELECT a FROM EventEntity a WHERE a.ownerId = :userId")
-//    @EntityGraph(value = "events_by_user")
-//    List<EventEntity> findAllEvents(@Param("user")Long userId);
+    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status AND e.date <= CURRENT_TIMESTAMP")
+    List<Long> findStartedEventsWithStatus(@Param("status") EventStatus status);
+
+    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
+    List<Long> indFinishedEventsWithStatus(@Param("status") EventStatus status);
+
+    @Modifying
+    @Query("UPDATE EventEntity e SET e.status = :newStatus WHERE e.id IN :ids")
+    void changeStatus(
+            @Param("ids") Long id,
+            @Param("newStatus") EventStatus eventStatus);
 }

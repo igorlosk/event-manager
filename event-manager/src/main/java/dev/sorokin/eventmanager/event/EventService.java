@@ -2,22 +2,18 @@ package dev.sorokin.eventmanager.event;
 
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
-import dev.sorokin.eventmanager.registration.RegistrationEntity;
-import dev.sorokin.eventmanager.registration.RegistrationRepository;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -72,7 +68,7 @@ public class EventService {
                 null,
                 event.name(),
                 userId,
-                location.capacity(),
+                event.maxPlaces(),
                 0,
                 event.date(),
                 event.cost(),
@@ -149,10 +145,10 @@ public class EventService {
 
         Integer userId = Math.toIntExact(authUser.id());
 
-            return eventRepository.findAllByOwnerId(userId)
-                    .stream()
-                    .map(eventToEntityMapper::toDomain)
-                    .toList();
+        return eventRepository.findAllByOwnerId(userId)
+                .stream()
+                .map(eventToEntityMapper::toDomain)
+                .toList();
     }
 
     @Transactional()
@@ -177,6 +173,25 @@ public class EventService {
 
         return list != null ? list : Collections.emptyList();
     }
+
+    @Scheduled(cron = "${event.status.cron}")
+    @Transactional
+    public void updateStatuses() {
+        LOGGER.info("Starting status update job");
+        List<Long> started = eventRepository.findStartedEventsWithStatus(EventStatus.WAIT_START);
+        if (!started.isEmpty()) {
+            started.forEach(id -> eventRepository.changeStatus(id, EventStatus.STARTED));
+            LOGGER.info("Updated {} events to STARTED", started.size());
+        }
+
+        List<Long> finished = eventRepository.indFinishedEventsWithStatus(EventStatus.STARTED);
+        if (!finished.isEmpty()) {
+            finished.forEach(id -> eventRepository.changeStatus(id, EventStatus.FINISHED));
+            LOGGER.info("Updated {} events to FINISHED", started.size());
+        }
+
+    }
+
 
 }
 

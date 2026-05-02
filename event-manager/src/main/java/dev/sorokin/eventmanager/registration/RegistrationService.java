@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -34,19 +33,29 @@ public class RegistrationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Event with ID %d not found", eventId)));
 
+        boolean isAlreadyRegistered = registrationRepository
+                .existsByUserIdAndEventId(authUser.id(), Math.toIntExact(eventId));
+
+        if (isAlreadyRegistered) {
+            throw new IllegalArgumentException(
+                    String.format("User %d is already registered to event %d",
+                            authUser.id(), eventId));
+        }
+
+
         if (eventToRegister.getStatus() != EventStatus.WAIT_START) {
             throw new IllegalArgumentException(
                     String.format("Cannot register to event %d: status is %s",
                             eventId, eventToRegister.getStatus()));
         }
 
-        boolean isAlreadyRegistered = registrationRepository
-                .existsByUserIdAndEventId(authUser.id(), eventId);
-        if (isAlreadyRegistered) {
+        if (eventToRegister.getOccupiedPlaces() >= eventToRegister.getMaxPlaces()) {
             throw new IllegalArgumentException(
-                    String.format("User %d is already registered to event %d",
-                            authUser.id(), eventId));
+                    String.format("Cannot register to event %d: occupiedPlaces %d maxPlace is %s",
+                            eventId, eventToRegister.getOccupiedPlaces(), eventToRegister.getMaxPlaces()));
         }
+
+
 
         eventToRegister.setOccupiedPlaces(eventToRegister.getOccupiedPlaces() + 1);
         eventRepository.save(eventToRegister);
