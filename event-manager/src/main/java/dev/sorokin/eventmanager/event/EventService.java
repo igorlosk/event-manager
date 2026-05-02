@@ -87,6 +87,7 @@ public class EventService {
     public Event getEventById(Long id) {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
+        LOGGER.info("Get event by id={}",id);
         return eventToEntityMapper.toDomain(eventEntity);
     }
 
@@ -145,6 +146,7 @@ public class EventService {
 
         Integer userId = Math.toIntExact(authUser.id());
 
+        LOGGER.info("Get owner events by userId={}", userId);
         return eventRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(eventToEntityMapper::toDomain)
@@ -171,6 +173,7 @@ public class EventService {
                 eventSearchRequestDto.eventStatus()
         ).stream().map(eventToEntityMapper::toDomain).toList();
 
+        LOGGER.info("Search events by filters");
         return list != null ? list : Collections.emptyList();
     }
 

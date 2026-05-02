@@ -55,8 +55,6 @@ public class RegistrationService {
                             eventId, eventToRegister.getOccupiedPlaces(), eventToRegister.getMaxPlaces()));
         }
 
-
-
         eventToRegister.setOccupiedPlaces(eventToRegister.getOccupiedPlaces() + 1);
         eventRepository.save(eventToRegister);
 

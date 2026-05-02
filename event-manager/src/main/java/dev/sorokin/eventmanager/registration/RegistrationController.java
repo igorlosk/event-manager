@@ -49,6 +49,7 @@ public class RegistrationController {
     @PreAuthorize("hasAuthority('USER')")
     List<RegistrationDto> getMyRegistrationEvent() {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
+        LOGGER.info("Get authorized user registrations");
         return registrationService.getAllMyEvents(authUser)
                 .stream()
                 .map(registrationToDtoMapper::toDto)

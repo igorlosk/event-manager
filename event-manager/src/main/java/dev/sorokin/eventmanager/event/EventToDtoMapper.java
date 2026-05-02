@@ -1,21 +1,15 @@
 package dev.sorokin.eventmanager.event;
 
-import dev.sorokin.eventmanager.registration.RegistrationToDtoMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Component
 public class EventToDtoMapper {
 
-    private final RegistrationToDtoMapper registrationToDtoMapper;
     private final DateTimeConverter dateTimeConverter;
 
-    public EventToDtoMapper(RegistrationToDtoMapper registrationToDtoMapper, DateTimeConverter dateTimeConverter) {
-        this.registrationToDtoMapper = registrationToDtoMapper;
+    public EventToDtoMapper(DateTimeConverter dateTimeConverter) {
         this.dateTimeConverter = dateTimeConverter;
     }
 

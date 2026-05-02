@@ -71,10 +71,12 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("eventStatus") EventStatus eventStatus
     );
 
-    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status AND e.date <= CURRENT_TIMESTAMP")
+    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status " +
+            "AND e.date <= CURRENT_TIMESTAMP")
     List<Long> findStartedEventsWithStatus(@Param("status") EventStatus status);
 
-    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
+    @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status " +
+            "AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
     List<Long> indFinishedEventsWithStatus(@Param("status") EventStatus status);
 
     @Modifying

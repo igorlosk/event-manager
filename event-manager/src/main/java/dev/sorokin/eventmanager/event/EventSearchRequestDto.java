@@ -3,6 +3,7 @@ package dev.sorokin.eventmanager.event;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record EventSearchRequestDto(
         @NotBlank
@@ -23,6 +24,7 @@ public record EventSearchRequestDto(
         Integer durationMin,
         @Min(30)
         Integer durationMax,
+        @NotNull
         Integer locationId,
         EventStatus eventStatus
 ) {
