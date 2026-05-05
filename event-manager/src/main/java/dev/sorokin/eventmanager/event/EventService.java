@@ -128,7 +128,7 @@ public class EventService {
                 dateTimeConverter.parseToLocalDateTime(eventDto.date()),
                 eventDto.cost(),
                 eventDto.duration(),
-                Math.toIntExact(eventId)
+                eventDto.locationId()
 
         );
 
