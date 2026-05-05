@@ -58,7 +58,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    @PreAuthorize("hasAnyAuthority({'USER', 'ADMIN'})")
     public ResponseEntity<EventDto> getEvent(@PathVariable("id") Long id) {
         Event event = eventService.getEventById(id);
         LOGGER.info("Retrieved event: {}", id);
@@ -66,7 +66,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    @PreAuthorize("hasAnyAuthority({'USER', 'ADMIN'})")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable("id") Long id,
             @RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto) {
@@ -77,7 +77,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    @PreAuthorize("hasAnyAuthority({'USER', 'ADMIN'})")
     public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long id) {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         LOGGER.info("Deleting event: {}", id);
@@ -97,7 +97,7 @@ public class EventController {
     }
 
     @PostMapping("/search")
-    @PreAuthorize("hasAuthority({'USER', 'ADMIN'})")
+    @PreAuthorize("hasAnyAuthority({'USER', 'ADMIN'})")
     public List<EventDto> searchFilter(@RequestBody @Valid EventSearchRequestDto eventSearchRequestDto){
         LOGGER.info("Get list events by search filter");
         return eventService.searchFilter(eventSearchRequestDto)
