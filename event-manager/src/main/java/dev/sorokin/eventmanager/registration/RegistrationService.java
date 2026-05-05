@@ -3,7 +3,9 @@ package dev.sorokin.eventmanager.registration;
 import dev.sorokin.eventmanager.event.*;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
