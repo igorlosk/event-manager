@@ -78,9 +78,9 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             "AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
     List<Long> indFinishedEventsWithStatus(@Param("status") EventStatus status);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE EventEntity e SET e.status = :newStatus WHERE e.id IN :ids")
     void changeStatus(
-            @Param("ids") Long id,
+            @Param("ids") List<Long> ids,
             @Param("newStatus") EventStatus eventStatus);
 }

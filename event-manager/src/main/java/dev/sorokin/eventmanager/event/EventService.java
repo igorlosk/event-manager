@@ -202,13 +202,13 @@ public class EventService {
         LOGGER.info("Starting status update job");
         List<Long> started = eventRepository.findStartedEventsWithStatus(EventStatus.WAIT_START);
         if (!started.isEmpty()) {
-            started.forEach(id -> eventRepository.changeStatus(id, EventStatus.STARTED));
+            started.forEach(id -> eventRepository.changeStatus(started, EventStatus.STARTED));
             LOGGER.info("Updated {} events to STARTED", started.size());
         }
 
         List<Long> finished = eventRepository.indFinishedEventsWithStatus(EventStatus.STARTED);
         if (!finished.isEmpty()) {
-            finished.forEach(id -> eventRepository.changeStatus(id, EventStatus.FINISHED));
+            finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
             LOGGER.info("Updated {} events to FINISHED", started.size());
         }
     }
