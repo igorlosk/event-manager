@@ -94,6 +94,9 @@ public class RegistrationService {
             throw new EntityNotFoundException("Registration not found");
         }
 
+        eventToRegister.setOccupiedPlaces(eventToRegister.getOccupiedPlaces() - 1);
+        eventRepository.save(eventToRegister);
+
         registrationRepository.delete(registrationEntity);
     }
 }
