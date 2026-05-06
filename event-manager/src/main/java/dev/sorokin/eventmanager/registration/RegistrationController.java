@@ -50,7 +50,7 @@ public class RegistrationController {
     List<RegistrationDto> getMyRegistrationEvent() {
         var authUser = authenticationService.getCurrentAuthenticatedUserOrThrow();
         LOGGER.info("Get authorized user registrations");
-        return registrationService.getAllMyEvents(authUser)
+        return registrationService.getAllMyRegisteredEvents(authUser)
                 .stream()
                 .map(registrationToDtoMapper::toDto)
                 .toList();

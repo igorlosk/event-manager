@@ -3,9 +3,7 @@ package dev.sorokin.eventmanager.registration;
 import dev.sorokin.eventmanager.event.*;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,7 +67,8 @@ public class RegistrationService {
         registrationRepository.save(registrationEntity);
     }
 
-    public List<Registration> getAllMyEvents(User authUser) {
+    @Transactional
+    public List<Registration> getAllMyRegisteredEvents(User authUser) {
         return registrationRepository.findAllByUserId(authUser.id())
                 .stream()
                 .map(registrationToEntityMapper::toDomain)

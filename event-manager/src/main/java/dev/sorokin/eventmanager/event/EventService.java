@@ -161,6 +161,7 @@ public class EventService {
         LOGGER.info("Event with id {} successfully deleted by user {}", id, authUser.id());
     }
 
+    @Transactional()
     public List<Event> getAllMyEvents(User authUser) {
 
         Integer userId = Math.toIntExact(authUser.id());

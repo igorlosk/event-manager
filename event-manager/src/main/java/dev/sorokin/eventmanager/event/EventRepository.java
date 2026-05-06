@@ -1,9 +1,7 @@
 package dev.sorokin.eventmanager.event;
 
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +39,13 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @EntityGraph(attributePaths = "registrations")
     List<EventEntity> findAllByOwnerId(Integer ownerId);
+
+//    @Query("SELECT DISTINCT e FROM EventEntity e " +
+//            "LEFT JOIN FETCH e.registrations " +
+//            "WHERE e.ownerId = :ownerId")
+//    List<EventEntity> findAllByOwnerIdWithRegistrations(@Param("ownerId") Integer ownerId);
+
+
 
     @Query("""
             SELECT e FROM EventEntity e 
