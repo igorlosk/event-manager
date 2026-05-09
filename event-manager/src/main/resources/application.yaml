@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: root
+    password: postgres
 
   jpa:
     hibernate:
@@ -33,3 +33,6 @@ springdoc:
 jwt:
   secretKey: Vw47liBU9qsTTOQVh26DSCMXO04XZyAQsRslmH3QlT6
 
+event:
+  status:
+    cron: "0 * * * * *"

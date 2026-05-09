@@ -1,6 +1,5 @@
-package dev.sorokin.eventmanager.controller;
+package dev.sorokin.eventmanager.location;
 
-import dev.sorokin.eventmanager.location.*;
 import jakarta.validation.Valid;
 import org.slf4j.*;
 import org.springframework.http.*;
