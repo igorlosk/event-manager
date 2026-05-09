@@ -1,6 +1,7 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.db;
 
-import dev.sorokin.eventmanager.registration.RegistrationToEntityMapper;
+import dev.sorokin.eventmanager.event.domain.Event;
+import dev.sorokin.eventmanager.registration.db.RegistrationToEntityMapper;
 import org.springframework.stereotype.Component;
 
 @Component

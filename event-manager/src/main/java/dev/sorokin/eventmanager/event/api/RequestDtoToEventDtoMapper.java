@@ -1,5 +1,6 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.api;
 
+import dev.sorokin.eventmanager.event.DateTimeConverter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,17 +11,6 @@ public class RequestDtoToEventDtoMapper {
     public RequestDtoToEventDtoMapper(DateTimeConverter dateTimeConverter) {
         this.dateTimeConverter = dateTimeConverter;
     }
-
-//    public EventCreateRequestDto toRequestDto(EventDto eventDto) {
-//        return new EventCreateRequestDto(
-//                eventDto.name(),
-//                eventDto.maxPlaces(),
-//                eventDto.date(),
-//                eventDto.cost(),
-//                eventDto.duration(),
-//                eventDto.locationId()
-//        );
-//    }
 
     public EventDto toEventDto(EventCreateRequestDto eventCreateRequestDto) {
         return new EventDto(

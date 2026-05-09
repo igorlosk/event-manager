@@ -1,5 +1,6 @@
-package dev.sorokin.eventmanager.registration;
+package dev.sorokin.eventmanager.registration.db;
 
+import dev.sorokin.eventmanager.registration.domain.Registration;
 import org.springframework.stereotype.Component;
 
 @Component

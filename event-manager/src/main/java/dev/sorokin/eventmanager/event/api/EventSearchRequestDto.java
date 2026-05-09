@@ -1,4 +1,6 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.api;
+
+import dev.sorokin.eventmanager.event.domain.EventStatus;
 
 public record EventSearchRequestDto(
         String name,

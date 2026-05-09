@@ -1,6 +1,7 @@
-package dev.sorokin.eventmanager.registration;
+package dev.sorokin.eventmanager.registration.api;
 
-import dev.sorokin.eventmanager.event.*;
+import dev.sorokin.eventmanager.event.api.EventController;
+import dev.sorokin.eventmanager.registration.domain.RegistrationService;
 import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

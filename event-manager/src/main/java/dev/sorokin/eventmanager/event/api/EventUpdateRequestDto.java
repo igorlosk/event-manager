@@ -1,21 +1,14 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.api;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 
-public record EventDto(
-        @NotNull
-        Integer id,
+public record EventUpdateRequestDto(
         @NotBlank
         String name,
-        @NotNull
-        Integer ownerId,
         @Min(1)
         Integer maxPlaces,
-        @PositiveOrZero
-        Integer occupiedPlaces,
         @NotBlank
         String date,
         @Min(1)
@@ -23,7 +16,6 @@ public record EventDto(
         @Min(30)
         Integer duration,
         @NotNull
-        Integer locationId,
-        EventStatus status
+        Integer locationId
 ) {
 }

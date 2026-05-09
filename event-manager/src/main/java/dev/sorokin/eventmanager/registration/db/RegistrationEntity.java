@@ -1,6 +1,6 @@
-package dev.sorokin.eventmanager.registration;
+package dev.sorokin.eventmanager.registration.db;
 
-import dev.sorokin.eventmanager.event.EventEntity;
+import dev.sorokin.eventmanager.event.db.EventEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

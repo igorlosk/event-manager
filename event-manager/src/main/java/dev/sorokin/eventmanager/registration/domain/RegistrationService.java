@@ -1,9 +1,16 @@
-package dev.sorokin.eventmanager.registration;
+package dev.sorokin.eventmanager.registration.domain;
 
-import dev.sorokin.eventmanager.event.*;
+import dev.sorokin.eventmanager.event.db.EventEntity;
+import dev.sorokin.eventmanager.event.db.EventRepository;
+import dev.sorokin.eventmanager.event.domain.EventStatus;
+import dev.sorokin.eventmanager.registration.db.RegistrationEntity;
+import dev.sorokin.eventmanager.registration.db.RegistrationRepository;
+import dev.sorokin.eventmanager.registration.db.RegistrationToEntityMapper;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,6 +35,7 @@ public class RegistrationService {
     }
 
     @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void registerToEvent(User authUser, Long eventId) {
         EventEntity eventToRegister = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException(

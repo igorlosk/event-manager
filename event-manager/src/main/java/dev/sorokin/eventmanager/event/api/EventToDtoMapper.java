@@ -1,5 +1,7 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.api;
 
+import dev.sorokin.eventmanager.event.DateTimeConverter;
+import dev.sorokin.eventmanager.event.domain.Event;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

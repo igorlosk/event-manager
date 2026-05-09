@@ -1,6 +1,6 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.domain;
 
-import dev.sorokin.eventmanager.registration.Registration;
+import dev.sorokin.eventmanager.registration.domain.Registration;
 
 import java.time.LocalDateTime;
 import java.util.List;

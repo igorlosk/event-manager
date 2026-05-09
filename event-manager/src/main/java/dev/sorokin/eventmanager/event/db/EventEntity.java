@@ -1,7 +1,8 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.sorokin.eventmanager.registration.RegistrationEntity;
+import dev.sorokin.eventmanager.event.domain.EventStatus;
+import dev.sorokin.eventmanager.registration.db.RegistrationEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

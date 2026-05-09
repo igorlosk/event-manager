@@ -1,6 +1,6 @@
-package dev.sorokin.eventmanager.registration;
+package dev.sorokin.eventmanager.registration.api;
 
-import dev.sorokin.eventmanager.event.EventEntity;
+import dev.sorokin.eventmanager.event.db.EventEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

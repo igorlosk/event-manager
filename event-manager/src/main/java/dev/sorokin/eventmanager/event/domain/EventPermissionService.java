@@ -1,4 +1,4 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.domain;
 
 import dev.sorokin.eventmanager.users.User;
 import dev.sorokin.eventmanager.users.UserRole;

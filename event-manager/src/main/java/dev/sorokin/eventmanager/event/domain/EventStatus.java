@@ -1,4 +1,4 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.domain;
 
 public enum EventStatus {
     WAIT_START,

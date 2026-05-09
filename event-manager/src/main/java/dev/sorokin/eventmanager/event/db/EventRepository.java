@@ -1,6 +1,6 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.db;
 
-import jakarta.persistence.LockModeType;
+import dev.sorokin.eventmanager.event.domain.EventStatus;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;

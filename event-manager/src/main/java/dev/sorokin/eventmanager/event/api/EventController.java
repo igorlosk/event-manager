@@ -1,5 +1,7 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.api;
 
+import dev.sorokin.eventmanager.event.domain.Event;
+import dev.sorokin.eventmanager.event.domain.EventService;
 import dev.sorokin.eventmanager.security.jwt.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

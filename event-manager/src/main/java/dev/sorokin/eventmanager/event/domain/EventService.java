@@ -1,5 +1,11 @@
-package dev.sorokin.eventmanager.event;
+package dev.sorokin.eventmanager.event.domain;
 
+import dev.sorokin.eventmanager.event.DateTimeConverter;
+import dev.sorokin.eventmanager.event.api.EventDto;
+import dev.sorokin.eventmanager.event.api.EventSearchRequestDto;
+import dev.sorokin.eventmanager.event.db.EventEntity;
+import dev.sorokin.eventmanager.event.db.EventRepository;
+import dev.sorokin.eventmanager.event.db.EventToEntityMapper;
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
 import dev.sorokin.eventmanager.users.User;
