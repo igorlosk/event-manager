@@ -19,6 +19,18 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/changelog-master.yaml
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      properties:
+        key.serializer: org.apache.kafka.common.serialization.LongSerializer
+        value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: event-notificator
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
 logging:
   level:
@@ -35,4 +47,5 @@ jwt:
 
 event:
   status:
-    cron: "0 * * * * *"
+    cron: "0 */5 * * * *"
+
