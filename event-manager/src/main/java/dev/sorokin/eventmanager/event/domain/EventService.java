@@ -1,6 +1,9 @@
 package dev.sorokin.eventmanager.event.domain;
 
+import dev.sorokin.eventcommon.kafka.ChangeItem;
+import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import dev.sorokin.eventmanager.event.DateTimeConverter;
+import dev.sorokin.eventmanager.event.EventChangeSender;
 import dev.sorokin.eventmanager.event.api.EventDto;
 import dev.sorokin.eventmanager.event.api.EventSearchRequestDto;
 import dev.sorokin.eventmanager.event.db.EventEntity;
@@ -8,9 +11,11 @@ import dev.sorokin.eventmanager.event.db.EventRepository;
 import dev.sorokin.eventmanager.event.db.EventToEntityMapper;
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
+import dev.sorokin.eventmanager.registration.db.RegistrationEntity;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,8 +23,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -31,19 +38,22 @@ public class EventService {
     private final LocationService locationService;
     private final EventPermissionService eventPermissionService;
     private final DateTimeConverter dateTimeConverter;
+    private final EventChangeSender eventChangeSender;
 
     public EventService(
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
             LocationService locationService,
             EventPermissionService eventPermissionService,
-            DateTimeConverter dateTimeConverter) {
+            DateTimeConverter dateTimeConverter,
+            EventChangeSender eventChangeSender) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
 
+        this.eventChangeSender = eventChangeSender;
     }
 
     @Transactional
@@ -140,6 +150,21 @@ public class EventService {
 
         EventEntity updatedEvent = eventRepository.findById(eventId).orElseThrow();
         LOGGER.info("Event with id {} successfully updated by user {}", eventId, authUser.id());
+
+        List<Long> subscribers = eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList();
+        Long eventOwnerId = Long.valueOf(eventEntity.getOwnerId());
+
+        eventChangeSender.sendChanges(new EventChangeKafkaMessage(
+                null,
+                "EVENT_UPDATED",
+                eventId,
+                LocalDateTime.now(),
+                eventOwnerId,
+                authUser.id(),
+                subscribers,
+                compareEvents(eventDto, eventEntity)
+                ));
+
         return eventToEntityMapper.toDomain(updatedEvent);
     }
 
@@ -218,6 +243,20 @@ public class EventService {
             finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
             LOGGER.info("Updated {} events to FINISHED", started.size());
         }
+    }
+
+    public List<ChangeItem> compareEvents(EventDto eventDto, EventEntity eventEntity) {
+        List<ChangeItem> list = new ArrayList<>();
+        if (!eventDto.name().equals(eventEntity.getName())) {
+            list.add(new ChangeItem(
+                    "name",
+                    eventEntity.getName(),
+                    eventDto.name()
+            ));
+        }
+
+
+        return list;
     }
 }
 
