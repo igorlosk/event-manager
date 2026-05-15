@@ -1,14 +1,12 @@
 package dev.sorokin.eventcommon.kafka;
 
-import org.apache.kafka.common.protocol.types.Field;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.UUID;
 
 
 public record EventChangeKafkaMessage(
-        Field.UUID messageId,
+        UUID messageId,
         String eventType,
         Long eventId,
         LocalDateTime occurredAt,

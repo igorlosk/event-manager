@@ -23,7 +23,7 @@ spring:
     bootstrap-servers: localhost:9092
     producer:
       properties:
-        key.serializer: org.apache.kafka.common.serialization.LongSerializer
+        key.serializer: org.apache.kafka.common.serialization.UUIDSerializer
         value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       group-id: event-notificator

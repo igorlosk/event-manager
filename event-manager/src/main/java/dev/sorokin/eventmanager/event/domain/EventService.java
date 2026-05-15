@@ -154,8 +154,10 @@ public class EventService {
         List<Long> subscribers = eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList();
         Long eventOwnerId = Long.valueOf(eventEntity.getOwnerId());
 
+
+
         eventChangeSender.sendChanges(new EventChangeKafkaMessage(
-                null,
+                UUID.randomUUID(),
                 "EVENT_UPDATED",
                 eventId,
                 LocalDateTime.now(),
@@ -254,7 +256,45 @@ public class EventService {
                     eventDto.name()
             ));
         }
+        if (!eventDto.locationId().equals(eventEntity.getLocationId())) {
+            list.add(new ChangeItem(
+                    "locationId",
+                    eventEntity.getLocationId(),
+                    eventDto.locationId()
+            ));
+        }
 
+        if (!eventDto.duration().equals(eventEntity.getDuration())) {
+            list.add(new ChangeItem(
+                    "duration",
+                    eventEntity.getDuration(),
+                    eventDto.duration()
+            ));
+        }
+
+        if (!eventDto.cost().equals(eventEntity.getCost())) {
+            list.add(new ChangeItem(
+                    "cost",
+                    eventEntity.getCost(),
+                    eventDto.cost()
+            ));
+        }
+
+        if (!eventDto.maxPlaces().equals(eventEntity.getMaxPlaces())) {
+            list.add(new ChangeItem(
+                    "maxPlace",
+                    eventEntity.getMaxPlaces(),
+                    eventDto.maxPlaces()
+            ));
+        }
+
+        if (!eventDto.date().equals(eventEntity.getDate())) {
+            list.add(new ChangeItem(
+                    "date",
+                    eventEntity.getDate(),
+                    eventDto.date()
+            ));
+        }
 
         return list;
     }
