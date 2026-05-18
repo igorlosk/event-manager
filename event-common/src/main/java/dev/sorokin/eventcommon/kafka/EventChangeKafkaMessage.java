@@ -8,6 +8,7 @@ import java.util.UUID;
 public record EventChangeKafkaMessage(
         UUID messageId,
         String eventType,
+        String eventName,
         Long eventId,
         LocalDateTime occurredAt,
         Long ownerId,

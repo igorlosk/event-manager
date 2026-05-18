@@ -1,6 +1,7 @@
 package dev.sorokin.eventnotificator;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,6 +23,7 @@ public class NotificationEventPayloadEntity {
     private Long ownerId;
     private Long changedById;
     @Column(nullable = false, columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     private String payloadJson;
 
     public NotificationEventPayloadEntity() {

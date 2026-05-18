@@ -1,7 +1,6 @@
 package dev.sorokin.eventmanager.event.db;
 
 import dev.sorokin.eventmanager.event.domain.EventStatus;
-import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +74,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status " +
             "AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
-    List<Long> indFinishedEventsWithStatus(@Param("status") EventStatus status);
+    List<Long> findFinishedEventsWithStatus(@Param("status") EventStatus status);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE EventEntity e SET e.status = :newStatus WHERE e.id IN :ids")

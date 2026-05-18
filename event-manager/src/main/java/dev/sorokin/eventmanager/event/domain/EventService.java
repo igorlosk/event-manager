@@ -15,7 +15,6 @@ import dev.sorokin.eventmanager.registration.db.RegistrationEntity;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -153,19 +152,23 @@ public class EventService {
 
         List<Long> subscribers = eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList();
         Long eventOwnerId = Long.valueOf(eventEntity.getOwnerId());
+        List<ChangeItem> changeItemList = compareEvents(eventDto, eventEntity);
+
+        if (!changeItemList.isEmpty()){
+            eventChangeSender.sendChanges(new EventChangeKafkaMessage(
+                    UUID.randomUUID(),
+                    "EVENT_UPDATED",
+                    eventEntity.getName(),
+                    eventId,
+                    LocalDateTime.now(),
+                    eventOwnerId,
+                    authUser.id(),
+                    subscribers,
+                    changeItemList
+            ));
+        }
 
 
-
-        eventChangeSender.sendChanges(new EventChangeKafkaMessage(
-                UUID.randomUUID(),
-                "EVENT_UPDATED",
-                eventId,
-                LocalDateTime.now(),
-                eventOwnerId,
-                authUser.id(),
-                subscribers,
-                compareEvents(eventDto, eventEntity)
-                ));
 
         return eventToEntityMapper.toDomain(updatedEvent);
     }
@@ -240,7 +243,7 @@ public class EventService {
             LOGGER.info("Updated {} events to STARTED", started.size());
         }
 
-        List<Long> finished = eventRepository.indFinishedEventsWithStatus(EventStatus.STARTED);
+        List<Long> finished = eventRepository.findFinishedEventsWithStatus(EventStatus.STARTED);
         if (!finished.isEmpty()) {
             finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
             LOGGER.info("Updated {} events to FINISHED", started.size());
@@ -249,12 +252,14 @@ public class EventService {
 
     public List<ChangeItem> compareEvents(EventDto eventDto, EventEntity eventEntity) {
         List<ChangeItem> list = new ArrayList<>();
+
         if (!eventDto.name().equals(eventEntity.getName())) {
             list.add(new ChangeItem(
                     "name",
                     eventEntity.getName(),
                     eventDto.name()
             ));
+
         }
         if (!eventDto.locationId().equals(eventEntity.getLocationId())) {
             list.add(new ChangeItem(
@@ -288,11 +293,14 @@ public class EventService {
             ));
         }
 
-        if (!eventDto.date().equals(eventEntity.getDate())) {
+        LocalDateTime eventDtoTime = dateTimeConverter.parseToLocalDateTime(eventDto.date());
+        LocalDateTime eventEntityTime = eventEntity.getDate();
+
+        if (!eventDtoTime.isEqual(eventEntityTime)) {
             list.add(new ChangeItem(
                     "date",
-                    eventEntity.getDate(),
-                    eventDto.date()
+                    eventDtoTime,
+                    eventEntityTime
             ));
         }
 
