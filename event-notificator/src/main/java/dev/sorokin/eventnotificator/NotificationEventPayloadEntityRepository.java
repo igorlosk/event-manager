@@ -23,4 +23,5 @@ public interface NotificationEventPayloadEntityRepository extends JpaRepository<
                        @Param("changedById") Long changedById,
                        @Param("payloadJson") String payloadJson);
 
+    boolean existsByMessageId(UUID messageId);
 }
