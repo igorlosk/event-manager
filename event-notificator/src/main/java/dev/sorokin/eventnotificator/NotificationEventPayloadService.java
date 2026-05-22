@@ -18,23 +18,25 @@ public class NotificationEventPayloadService {
 
     public void saveNotifications(EventChangeKafkaMessage value) {
 
-        EventPayload eventPayload = new EventPayload(
-                value.eventName(),
-                value.changedById(),
-                value.changes()
-        );
+        if(!notificationEventPayloadEntityRepository.existsByMessageId(value.messageId())){
+            EventPayload eventPayload = new EventPayload(
+                    value.eventName(),
+                    value.changedById(),
+                    value.changes()
+            );
 
-        NotificationEventPayloadEntity eventPayloadEntity = new NotificationEventPayloadEntity(
-                null,
-                value.messageId(),
-                "EVENT_UPDATED",
-                value.eventId(),
-                value.occurredAt(),
-                value.ownerId(),
-                value.changedById(),
-                toJson(eventPayload)
-        );
-        notificationEventPayloadEntityRepository.save(eventPayloadEntity);
+            NotificationEventPayloadEntity eventPayloadEntity = new NotificationEventPayloadEntity(
+                    null,
+                    value.messageId(),
+                    "EVENT_UPDATED",
+                    value.eventId(),
+                    value.occurredAt(),
+                    value.ownerId(),
+                    value.changedById(),
+                    toJson(eventPayload)
+            );
+            notificationEventPayloadEntityRepository.save(eventPayloadEntity);
+        }
     }
 
     public String toJson(EventPayload eventPayload) {

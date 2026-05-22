@@ -13,4 +13,6 @@ public interface NotificationEventPayloadEntityRepository extends JpaRepository<
 
 
     NotificationEventPayloadEntity findByMessageId(UUID messageId);
+
+    boolean existsByMessageId(UUID messageId);
 }
