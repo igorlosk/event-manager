@@ -156,7 +156,7 @@ public class EventService {
 
         if (!changeItemList.isEmpty()){
             eventChangeSender.sendChanges(new EventChangeKafkaMessage(
-                    generateUUIDFromLongId(eventId),
+                    UUID.randomUUID(),
                     "EVENT_UPDATED",
                     eventEntity.getName(),
                     eventId,
@@ -307,8 +307,8 @@ public class EventService {
         return list;
     }
 
-    public UUID generateUUIDFromLongId(Long eventId) {
-        return UUID.nameUUIDFromBytes(String.valueOf(eventId).getBytes());
-    }
+//    public UUID generateUUIDFromLongId(Long eventId) {
+//        return UUID.nameUUIDFromBytes(String.valueOf(eventId).getBytes());
+//    }
 }
 

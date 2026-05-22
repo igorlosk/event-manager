@@ -2,7 +2,6 @@ package dev.sorokin.eventnotificator;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,10 +14,13 @@ public class EventKafkaListener {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EventKafkaListener.class);
 
-    private final EventNotificatorService eventNotificatorService;
+    private final NotificationEventPayloadService notificationEventPayloadService;
 
-    public EventKafkaListener(EventNotificatorService eventNotificatorService) {
-        this.eventNotificatorService = eventNotificatorService;
+    private final NotificationService notificationService;
+
+    public EventKafkaListener(NotificationEventPayloadService notificationEventPayloadService, NotificationService notificationService) {
+        this.notificationEventPayloadService = notificationEventPayloadService;
+        this.notificationService = notificationService;
     }
 
     @KafkaListener(topics = "events-topic", containerFactory = "containerFactory")
@@ -26,6 +28,8 @@ public class EventKafkaListener {
             ConsumerRecord<UUID, EventChangeKafkaMessage> record
     ) {
         LOGGER.info("Event changed: event={}", record.value());
-        eventNotificatorService.saveNotifications(record.value());
+        notificationEventPayloadService.saveNotifications(record.value());
+        notificationService.createNotificationForUsers(record.value());
+
     }
 }
