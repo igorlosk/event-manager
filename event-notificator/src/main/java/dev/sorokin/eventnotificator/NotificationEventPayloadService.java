@@ -3,10 +3,14 @@ package dev.sorokin.eventnotificator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationEventPayloadService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(NotificationEventPayloadService.class);
 
     private final NotificationEventPayloadEntityRepository notificationEventPayloadEntityRepository;
 
@@ -17,7 +21,6 @@ public class NotificationEventPayloadService {
     }
 
     public void saveNotifications(EventChangeKafkaMessage value) {
-
         if(!notificationEventPayloadEntityRepository.existsByMessageId(value.messageId())){
             EventPayload eventPayload = new EventPayload(
                     value.eventName(),
@@ -36,6 +39,7 @@ public class NotificationEventPayloadService {
                     toJson(eventPayload)
             );
             notificationEventPayloadEntityRepository.save(eventPayloadEntity);
+            LOGGER.info("Notification Event Payload Saved Successfully. MessageId={}", value.messageId());
         }
     }
 

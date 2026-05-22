@@ -1,10 +1,14 @@
 package dev.sorokin.eventnotificator;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationEventPayloadEntityRepository notificationEventPayloadEntityRepository;
 
@@ -21,16 +25,17 @@ public class NotificationService {
         NotificationEventPayloadEntity eventPayloadEntity =
                 notificationEventPayloadEntityRepository.findByMessageId(value.messageId());
 
-        value.subscribers().forEach(subscriberId ->
-                notificationEntityRepository.save(new NotificationEntity(
-                        null,
-                        subscriberId,
-                        false,
-                        value.occurredAt(),
-                        null,
-                        eventPayloadEntity
-                ))
+        value.subscribers().forEach(subscriberId -> {
+                    notificationEntityRepository.save(new NotificationEntity(
+                            null,
+                            subscriberId,
+                            false,
+                            value.occurredAt(),
+                            null,
+                            eventPayloadEntity
+                    ));
+                    LOGGER.info("Created notification for user id={}", subscriberId);
+                }
         );
-
     }
 }
