@@ -1,9 +1,15 @@
-package dev.sorokin.eventnotificator;
+package dev.sorokin.eventnotificator.domain;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import dev.sorokin.eventnotificator.db.NotificationEntity;
+import dev.sorokin.eventnotificator.db.NotificationEntityRepository;
+import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
+import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class NotificationService {
@@ -37,5 +43,10 @@ public class NotificationService {
                     LOGGER.info("Created notification for user id={}", subscriberId);
                 }
         );
+    }
+
+    public List<NotificationResponse> getAllNotifications() {
+
+        return null;
     }
 }

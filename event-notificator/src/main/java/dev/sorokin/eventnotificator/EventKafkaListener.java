@@ -1,6 +1,8 @@
 package dev.sorokin.eventnotificator;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import dev.sorokin.eventnotificator.domain.NotificationEventPayloadService;
+import dev.sorokin.eventnotificator.domain.NotificationService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

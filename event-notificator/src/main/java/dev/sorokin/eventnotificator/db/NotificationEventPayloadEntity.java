@@ -1,4 +1,4 @@
-package dev.sorokin.eventnotificator;
+package dev.sorokin.eventnotificator.db;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
