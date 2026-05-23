@@ -1,5 +1,6 @@
 package dev.sorokin.eventnotificator.api;
 
+import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.domain.NotificationService;
 import dev.sorokin.eventnotificator.security.JwtValidationService;
 import org.slf4j.Logger;
@@ -30,13 +31,13 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<NotificationResponseDto> getNotifications(
+    public List<NotificationEntity> getNotifications(
             @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7);
 
         Long userId = jwtValidationService.extractUserId(token);
 
-        return null;
+        return notificationService.getNotificationsByUserId(userId).stream().toList();
     }
 }

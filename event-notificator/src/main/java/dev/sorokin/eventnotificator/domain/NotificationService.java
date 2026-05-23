@@ -47,8 +47,9 @@ public class NotificationService {
         );
     }
 
-    public List<NotificationResponseDto> getNotificationsByUserId(Long userId) {
-        return null;
+    public List<NotificationEntity> getNotificationsByUserId(Long userId) {
+
+        return notificationEntityRepository.findAllByUserId(userId).stream().toList();
     }
 }
 
