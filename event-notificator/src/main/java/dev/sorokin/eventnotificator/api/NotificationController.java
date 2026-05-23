@@ -30,12 +30,12 @@ public class NotificationController {
     }
 
     @GetMapping
-    public String getNotifications(
-            ) {
+    public Long getNotifications(
+            @RequestHeader("Authorization") String authHeader) {
 
-//        String token = authHeader.substring(7);
-//
-//        Long userId = jwtValidationService.extractUserId(token);
+        String token = authHeader.substring(7);
+
+        Long userId = jwtValidationService.extractUserId(token);
 
         // 5. Используем userId для получения уведомлений
         //    ВАЖНО: не проверяем существование этого userId в БД нотификатора,
@@ -45,6 +45,6 @@ public class NotificationController {
 //                .map(notificationResponseToDtoMapper::toDto)
 //                .toList();
 
-        return "Hello";
+        return userId;
     }
 }

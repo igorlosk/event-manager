@@ -29,7 +29,8 @@ public class JwtValidationService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        String userIdStr = claims.getSubject();
-        return Long.parseLong(userIdStr);
+
+        // userId хранится в кастомном поле "userId", а не в subject
+        return claims.get("userId", Long.class);
     }
 }
