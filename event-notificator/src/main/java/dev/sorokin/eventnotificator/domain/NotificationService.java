@@ -1,6 +1,7 @@
 package dev.sorokin.eventnotificator.domain;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import dev.sorokin.eventnotificator.api.NotificationResponseDto;
 import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.db.NotificationEntityRepository;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
@@ -46,9 +47,9 @@ public class NotificationService {
         );
     }
 
-    public List<NotificationResponse> getAllNotifications() {
-
+    public List<NotificationResponseDto> getNotificationsByUserId(Long userId) {
         return null;
     }
 }
+
 
