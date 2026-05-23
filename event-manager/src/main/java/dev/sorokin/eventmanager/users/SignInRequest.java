@@ -7,6 +7,5 @@ public record SignInRequest(
         String login,
         @NotBlank
         String password
-
 ) {
 }
