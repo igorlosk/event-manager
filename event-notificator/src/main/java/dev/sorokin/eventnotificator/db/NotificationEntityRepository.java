@@ -15,11 +15,6 @@ public interface NotificationEntityRepository extends JpaRepository<Notification
 
     @Modifying
     @Transactional
-    @Query("UPDATE NotificationEntity n SET n.isRead = true, n.readAt = CURRENT_TIMESTAMP WHERE n.id IN :ids")
-    void markAsReadByIds(@Param("ids") List<Long> ids);
-
-    @Modifying
-    @Transactional
     @Query("UPDATE NotificationEntity n SET n.isRead = true, n.readAt = CURRENT_TIMESTAMP " +
             "WHERE n.id IN :ids AND n.userId = :userId")
     int markAsReadByIdsAndUserId(@Param("ids") List<Long> ids, @Param("userId") Long userId);

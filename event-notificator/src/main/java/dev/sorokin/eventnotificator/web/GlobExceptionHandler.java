@@ -63,7 +63,7 @@ public class GlobExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ServerErrorDto> handleUnauthorized(UnauthorizedException e) {
         var errorDto = new ServerErrorDto(
-                "Пользователь не авторизован",
+                "У данного пользователя нет прав на чтение уведомлений",
                 e.getMessage(),
                 LocalDateTime.now());
         return ResponseEntity
