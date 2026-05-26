@@ -1,4 +1,4 @@
-package dev.sorokin.eventnotificator;
+package dev.sorokin.eventnotificator.domain;
 
 import org.springframework.stereotype.Component;
 

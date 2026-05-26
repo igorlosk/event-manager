@@ -31,13 +31,16 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<NotificationEntity> getNotifications(
+    public List<NotificationResponseDto> getNotifications(
             @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7);
 
         Long userId = jwtValidationService.extractUserId(token);
 
-        return notificationService.getNotificationsByUserId(userId).stream().toList();
+        return notificationService.getNotificationsByUserId(userId)
+                .stream()
+                .map(notificationResponseToDtoMapper::toDto)
+                .toList();
     }
 }

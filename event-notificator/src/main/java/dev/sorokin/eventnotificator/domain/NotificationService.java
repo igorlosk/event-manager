@@ -1,7 +1,6 @@
 package dev.sorokin.eventnotificator.domain;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
-import dev.sorokin.eventnotificator.api.NotificationResponseDto;
 import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.db.NotificationEntityRepository;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -22,11 +20,17 @@ public class NotificationService {
 
     private final NotificationEntityRepository notificationEntityRepository;
 
+    private final NotificationPayloadMapper notificationPayloadMapper;
+
+    private final DateTimeConverter dateTimeConverter;
+
     public NotificationService(
             NotificationEventPayloadEntityRepository notificationEventPayloadEntityRepository,
-            NotificationEntityRepository notificationEntityRepository) {
+            NotificationEntityRepository notificationEntityRepository, NotificationPayloadMapper notificationPayloadMapper, DateTimeConverter dateTimeConverter) {
         this.notificationEventPayloadEntityRepository = notificationEventPayloadEntityRepository;
         this.notificationEntityRepository = notificationEntityRepository;
+        this.notificationPayloadMapper = notificationPayloadMapper;
+        this.dateTimeConverter = dateTimeConverter;
     }
 
     public void createNotificationForUsers(EventChangeKafkaMessage value) {
@@ -47,10 +51,25 @@ public class NotificationService {
         );
     }
 
-    public List<NotificationEntity> getNotificationsByUserId(Long userId) {
+    public List<NotificationResponse> getNotificationsByUserId(Long userId) {
 
-        return notificationEntityRepository.findAllByUserId(userId).stream().toList();
+        List<NotificationEntity> list = notificationEntityRepository.findAllByUserId(userId).stream().toList();
+
+        List<NotificationResponse> responses = list.stream()
+                .map(notificationEntity -> new NotificationResponse(
+                        notificationEntity.getId(),
+                        notificationEntity.getPayload().getEventType(),
+                        notificationEntity.getPayload().getEventId(),
+                        dateTimeConverter.formatToString(notificationEntity.getCreatedAt()),
+                        notificationEntity.isRead(),
+                        "Событие было изменено",
+                        notificationPayloadMapper.toNotificationPayload(notificationEntity.getPayload())
+                ))
+                .toList();
+
+        return responses;
     }
+
 }
 
 

@@ -3,7 +3,6 @@ package dev.sorokin.eventnotificator.domain;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
-import dev.sorokin.eventnotificator.DateTimeConverter;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntityRepository;
 import org.slf4j.Logger;
@@ -43,14 +42,14 @@ public class NotificationEventPayloadService {
                     value.occurredAt(),
                     value.ownerId(),
                     value.changedById(),
-                    toJson(notificationPayload)
+                    toString(notificationPayload)
             );
             notificationEventPayloadEntityRepository.save(eventPayloadEntity);
             LOGGER.info("Notification Event Payload Saved Successfully. MessageId={}", value.messageId());
         }
     }
 
-    public String toJson(NotificationPayload notificationPayload) {
+    public String toString(NotificationPayload notificationPayload) {
         try {
             return objectMapper.writeValueAsString(notificationPayload);
         } catch (JsonProcessingException e) {
