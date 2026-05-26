@@ -1,14 +1,18 @@
 package dev.sorokin.eventnotificator.domain;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import dev.sorokin.eventnotificator.api.MarkNotificationsAsReadRequestDto;
 import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.db.NotificationEntityRepository;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -53,7 +57,10 @@ public class NotificationService {
 
     public List<NotificationResponse> getNotificationsByUserId(Long userId) {
 
-        List<NotificationEntity> list = notificationEntityRepository.findAllByUserId(userId).stream().toList();
+        List<NotificationEntity> list = notificationEntityRepository
+                .findAllByUserId(userId)
+                .stream()
+                .toList();
 
         List<NotificationResponse> responses = list.stream()
                 .map(notificationEntity -> new NotificationResponse(
@@ -70,6 +77,25 @@ public class NotificationService {
         return responses;
     }
 
+    public void markAsRead(
+            Long userId,
+            MarkNotificationsAsReadRequestDto markNotificationsAsReadRequestDto) {
+
+        List<Long> notificationsId = markNotificationsAsReadRequestDto.notificationIds();
+
+        if (notificationsId == null || notificationsId.isEmpty()) {
+            throw new IllegalArgumentException("No Ids to update");
+        }
+
+        int updatedCount = notificationEntityRepository
+                .markAsReadByIdsAndUserId(notificationsId, userId);
+
+        if (updatedCount == 0) {
+            throw new IllegalArgumentException("No Ids to update");
+        }
+
+        LOGGER.info("Marked as read {} notifications for user {}", updatedCount, userId);
+    }
 }
 
 

@@ -1,14 +1,15 @@
 package dev.sorokin.eventnotificator.api;
 
-import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.domain.NotificationService;
 import dev.sorokin.eventnotificator.security.JwtValidationService;
+import dev.sorokin.eventnotificator.web.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,13 +35,57 @@ public class NotificationController {
     public List<NotificationResponseDto> getNotifications(
             @RequestHeader("Authorization") String authHeader) {
 
+        isHeaderPresent(authHeader);
+
         String token = authHeader.substring(7);
 
-        Long userId = jwtValidationService.extractUserId(token);
+        validToken(token);
 
-        return notificationService.getNotificationsByUserId(userId)
-                .stream()
-                .map(notificationResponseToDtoMapper::toDto)
-                .toList();
+        try {
+            Long userId = jwtValidationService.extractUserId(token);
+            return notificationService.getNotificationsByUserId(userId)
+                    .stream()
+                    .map(notificationResponseToDtoMapper::toDto)
+                    .toList();
+        } catch (Exception e) {
+            LOGGER.warn("Invalid token used: {}", e.getMessage());
+            throw new UnauthorizedException("Invalid token");
+        }
+
+    }
+
+
+    @PostMapping
+    public ResponseEntity<Void> markAsRead(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody MarkNotificationsAsReadRequestDto markNotificationsAsReadRequestDto) {
+
+        isHeaderPresent(authHeader);
+
+        String token = authHeader.substring(7);
+
+        validToken(token);
+
+        try {
+            Long userId = jwtValidationService.extractUserId(token);
+            notificationService.markAsRead(userId, markNotificationsAsReadRequestDto);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception e) {
+            LOGGER.warn("Invalid token used: {}", e.getMessage());
+            throw new UnauthorizedException("Invalid token");
+        }
+    }
+
+    private static void validToken(String token) {
+        if (token.isBlank()) {
+            LOGGER.warn("Empty token provided");
+            throw new UnauthorizedException("Token is empty");
+        }
+    }
+
+    private static void isHeaderPresent(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Missing or invalid Authorization header");
+        }
     }
 }
