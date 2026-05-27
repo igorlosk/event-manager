@@ -2,8 +2,7 @@ package dev.sorokin.eventnotificator;
 
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.protocol.types.Field;
-import org.apache.kafka.common.serialization.LongDeserializer;
+
 import org.apache.kafka.common.serialization.UUIDDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

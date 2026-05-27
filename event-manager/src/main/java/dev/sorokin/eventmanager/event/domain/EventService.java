@@ -154,7 +154,7 @@ public class EventService {
         Long eventOwnerId = Long.valueOf(eventEntity.getOwnerId());
         List<ChangeItem> changeItemList = compareEvents(eventDto, eventEntity);
 
-        if (!changeItemList.isEmpty()){
+        if (!changeItemList.isEmpty()) {
             eventChangeSender.sendChanges(new EventChangeKafkaMessage(
                     UUID.randomUUID(),
                     "EVENT_UPDATED",
@@ -167,7 +167,6 @@ public class EventService {
                     changeItemList
             ));
         }
-
 
 
         return eventToEntityMapper.toDomain(updatedEvent);
@@ -240,14 +239,34 @@ public class EventService {
         List<Long> started = eventRepository.findStartedEventsWithStatus(EventStatus.WAIT_START);
         if (!started.isEmpty()) {
             started.forEach(id -> eventRepository.changeStatus(started, EventStatus.STARTED));
+            sendMessage(started, EventStatus.WAIT_START, EventStatus.STARTED);
             LOGGER.info("Updated {} events to STARTED", started.size());
         }
 
         List<Long> finished = eventRepository.findFinishedEventsWithStatus(EventStatus.STARTED);
         if (!finished.isEmpty()) {
             finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
+            sendMessage(started, EventStatus.STARTED, EventStatus.FINISHED);
             LOGGER.info("Updated {} events to FINISHED", started.size());
         }
+    }
+
+    public void sendMessage(List<Long> eventsToChangeId, EventStatus eventStatusOld, EventStatus eventStatusNew) {
+        List<ChangeItem> changeItem = List.of(new ChangeItem("Status", eventStatusOld, eventStatusNew));
+        List<EventEntity> entityList = eventRepository.findAllById(eventsToChangeId);
+        entityList.forEach(eventEntity -> {
+            eventChangeSender.sendChanges(new EventChangeKafkaMessage(
+                    UUID.randomUUID(),
+                    "EVENT_UPDATED",
+                    eventEntity.getName(),
+                    Long.valueOf(eventEntity.getId()),
+                    LocalDateTime.now(),
+                    Long.valueOf(eventEntity.getOwnerId()),
+                    null,
+                    eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList(),
+                    changeItem
+            ));
+        });
     }
 
     public List<ChangeItem> compareEvents(EventDto eventDto, EventEntity eventEntity) {
@@ -306,9 +325,5 @@ public class EventService {
 
         return list;
     }
-
-//    public UUID generateUUIDFromLongId(Long eventId) {
-//        return UUID.nameUUIDFromBytes(String.valueOf(eventId).getBytes());
-//    }
 }
 

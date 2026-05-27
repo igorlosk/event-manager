@@ -8,8 +8,8 @@ public record NotificationPayload(
         String messageId,
         String eventType,
         String occurredAt,
-        Integer changedById,
-        Integer ownerId,
+        Long changedById,
+        Long ownerId,
         String eventName,
         List<ChangeItem> changeItem
 ) {

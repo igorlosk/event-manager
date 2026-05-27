@@ -28,8 +28,8 @@ public class NotificationEventPayloadService {
                     value.messageId().toString(),
                     value.eventType(),
                     dateTimeConverter.formatToString(value.occurredAt()),
-                    Math.toIntExact(value.changedById()),
-                    Math.toIntExact(value.ownerId()),
+                    value.changedById(),
+                    value.ownerId(),
                     value.eventName(),
                     value.changes()
             );
