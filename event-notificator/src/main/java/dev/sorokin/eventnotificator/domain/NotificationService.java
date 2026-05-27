@@ -103,8 +103,10 @@ public class NotificationService {
     @Transactional
     public void deleteNotificationsOlderThan7Days() {
         LocalDateTime thresholdDate = LocalDateTime.now().minusDays(7);
-        int deletedCount = notificationEntityRepository.deleteOldNotifications(thresholdDate);
-        LOGGER.info("Deleted {} notifications older than 7 days", deletedCount);
+        int deletedNotifications = notificationEntityRepository.deleteNotificationsByPayloadDate(thresholdDate);
+        LOGGER.info("Deleted {} notifications older than 7 days", deletedNotifications);
+        int deletedNotificationsPayload = notificationEventPayloadEntityRepository.deletePayload(thresholdDate);
+        LOGGER.info("Deleted {} notificationsPayload older than 7 days", deletedNotificationsPayload);
     }
 
 }

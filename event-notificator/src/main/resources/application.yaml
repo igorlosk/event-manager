@@ -42,4 +42,4 @@ jwt:
 
 event:
   status:
-    cron: "0 * * * * *"
+    cron: "0 */5 * * * *"

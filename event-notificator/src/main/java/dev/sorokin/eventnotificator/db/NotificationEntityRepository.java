@@ -21,6 +21,6 @@ public interface NotificationEntityRepository extends JpaRepository<Notification
     int markAsReadByIdsAndUserId(@Param("ids") List<Long> ids, @Param("userId") Long userId);
 
     @Modifying
-    @Query("DELETE FROM NotificationEntity e WHERE e.createdAt <= :thresholdDate")
-    int deleteOldNotifications(@Param("thresholdDate") LocalDateTime thresholdDate);
+    @Query("DELETE FROM NotificationEntity n WHERE n.payload.occurredAt <= :thresholdDate")
+    int deleteNotificationsByPayloadDate(LocalDateTime thresholdDate);
 }
