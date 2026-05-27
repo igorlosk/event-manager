@@ -40,4 +40,6 @@ logging:
 jwt:
   secretKey: Vw47liBU9qsTTOQVh26DSCMXO04XZyAQsRslmH3QlT6
 
-
+event:
+  status:
+    cron: "0 * * * * *"

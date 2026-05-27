@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NotificationEntityRepository extends JpaRepository<NotificationEntity, Long> {
@@ -18,4 +19,8 @@ public interface NotificationEntityRepository extends JpaRepository<Notification
     @Query("UPDATE NotificationEntity n SET n.isRead = true, n.readAt = CURRENT_TIMESTAMP " +
             "WHERE n.id IN :ids AND n.userId = :userId")
     int markAsReadByIdsAndUserId(@Param("ids") List<Long> ids, @Param("userId") Long userId);
+
+    @Modifying
+    @Query("DELETE FROM NotificationEntity e WHERE e.createdAt <= :thresholdDate")
+    int deleteOldNotifications(@Param("thresholdDate") LocalDateTime thresholdDate);
 }

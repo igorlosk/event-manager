@@ -6,9 +6,11 @@ import dev.sorokin.eventnotificator.db.NotificationEntity;
 import dev.sorokin.eventnotificator.db.NotificationEntityRepository;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntity;
 import dev.sorokin.eventnotificator.db.NotificationEventPayloadEntityRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -96,6 +98,15 @@ public class NotificationService {
 
         LOGGER.info("Marked as read {} notifications for user {}", updatedCount, userId);
     }
+
+    @Scheduled(cron = "${event.status.cron}")
+    @Transactional
+    public void deleteNotificationsOlderThan7Days() {
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(7);
+        int deletedCount = notificationEntityRepository.deleteOldNotifications(thresholdDate);
+        LOGGER.info("Deleted {} notifications older than 7 days", deletedCount);
+    }
+
 }
 
 
