@@ -17,16 +17,4 @@ public class NotificationResponseToDtoMapper {
                 notificationResponse.payload()
         );
     }
-
-    public NotificationResponse toDomain(NotificationResponseDto notificationResponseDto) {
-        return new NotificationResponse(
-                notificationResponseDto.notificationId(),
-                notificationResponseDto.type(),
-                notificationResponseDto.eventId(),
-                notificationResponseDto.createdAt(),
-                notificationResponseDto.isRead(),
-                notificationResponseDto.message(),
-                notificationResponseDto.payload()
-        );
-    }
 }

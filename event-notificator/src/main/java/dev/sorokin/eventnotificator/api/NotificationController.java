@@ -3,13 +3,11 @@ package dev.sorokin.eventnotificator.api;
 import dev.sorokin.eventnotificator.domain.NotificationService;
 import dev.sorokin.eventnotificator.security.JwtValidationService;
 import dev.sorokin.eventnotificator.web.UnauthorizedException;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
