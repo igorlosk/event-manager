@@ -35,7 +35,6 @@ public class RegistrationService {
     }
 
     @Transactional
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void registerToEvent(User authUser, Long eventId) {
         EventEntity eventToRegister = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException(
