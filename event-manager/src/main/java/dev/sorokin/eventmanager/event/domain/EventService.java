@@ -251,7 +251,7 @@ public class EventService {
         }
     }
 
-    public void sendMessage(List<Long> eventsToChangeId, EventStatus eventStatusOld, EventStatus eventStatusNew) {
+    private void sendMessage(List<Long> eventsToChangeId, EventStatus eventStatusOld, EventStatus eventStatusNew) {
         List<ChangeItem> changeItem = List.of(new ChangeItem("Status", eventStatusOld, eventStatusNew));
         List<EventEntity> entityList = eventRepository.findAllById(eventsToChangeId);
         entityList.forEach(eventEntity -> {
