@@ -60,17 +60,6 @@ public class GlobExceptionHandler {
                 .body(newDto);
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ServerErrorDto> handleUnauthorized(UnauthorizedException e) {
-        var errorDto = new ServerErrorDto(
-                "У данного пользователя нет прав на чтение уведомлений",
-                e.getMessage(),
-                LocalDateTime.now());
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(errorDto);
-    }
-
     private static String constructMethodArgumentNotValidMessage(
             MethodArgumentNotValidException e) {
         return e.getBindingResult()
