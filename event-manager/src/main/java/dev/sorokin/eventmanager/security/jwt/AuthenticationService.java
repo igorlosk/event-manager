@@ -33,7 +33,7 @@ public class AuthenticationService {
         );
         UserEntity user = userRepository.findByLogin(signInRequest.login())
                 .orElseThrow(() -> new RuntimeException("User not found after authentication"));
-        return jwtTokenManager.generateJwtToken(signInRequest.login(), user.getId());
+        return jwtTokenManager.generateJwtToken(signInRequest.login(), user.getId(), user.getRole());
     }
 
     public User getCurrentAuthenticatedUserOrThrow() {

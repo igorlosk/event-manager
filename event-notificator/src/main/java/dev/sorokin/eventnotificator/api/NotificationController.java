@@ -1,10 +1,7 @@
 package dev.sorokin.eventnotificator.api;
 
 import dev.sorokin.eventnotificator.domain.NotificationService;
-import dev.sorokin.eventnotificator.security.JwtValidationService;
-import dev.sorokin.eventnotificator.web.UnauthorizedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.sorokin.eventnotificator.security.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,75 +12,38 @@ import java.util.List;
 @RequestMapping("/notifications")
 public class NotificationController {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
-
-    private final JwtValidationService jwtValidationService;
-
     private final NotificationService notificationService;
 
     private final NotificationResponseToDtoMapper notificationResponseToDtoMapper;
 
-    public NotificationController(JwtValidationService jwtValidationService, NotificationService notificationService, NotificationResponseToDtoMapper notificationResponseToDtoMapper) {
-        this.jwtValidationService = jwtValidationService;
+    private final AuthenticationService authenticationService;
+
+    public NotificationController(
+            NotificationService notificationService,
+            NotificationResponseToDtoMapper notificationResponseToDtoMapper,
+            AuthenticationService authenticationService) {
         this.notificationService = notificationService;
         this.notificationResponseToDtoMapper = notificationResponseToDtoMapper;
+        this.authenticationService = authenticationService;
     }
+
 
     @GetMapping
-    public List<NotificationResponseDto> getNotifications(
-            @RequestHeader("Authorization") String authHeader) {
-
-        isHeaderPresent(authHeader);
-
-        String token = authHeader.substring(7);
-
-        validToken(token);
-
-        try {
-            Long userId = jwtValidationService.extractUserId(token);
-            return notificationService.getNotificationsByUserId(userId)
-                    .stream()
-                    .map(notificationResponseToDtoMapper::toDto)
-                    .toList();
-        } catch (Exception e) {
-            LOGGER.warn("Invalid token used: {}", e.getMessage());
-            throw new UnauthorizedException("Invalid token");
-        }
-
+    public List<NotificationResponseDto> getNotifications() {
+        var authUser = authenticationService.getAuthUser();
+        return notificationService.getNotificationsByUserId(authUser.id())
+                .stream()
+                .map(notificationResponseToDtoMapper::toDto)
+                .toList();
     }
-
 
     @PostMapping
-    public ResponseEntity<Void> markAsRead(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody MarkNotificationsAsReadRequestDto markNotificationsAsReadRequestDto) {
-
-        isHeaderPresent(authHeader);
-
-        String token = authHeader.substring(7);
-
-        validToken(token);
-
-        try {
-            Long userId = jwtValidationService.extractUserId(token);
-            notificationService.markAsRead(userId, markNotificationsAsReadRequestDto);
+    public ResponseEntity<Void> markAsRead (
+            @RequestBody MarkNotificationsAsReadRequestDto markNotificationsAsReadRequestDto
+    ){
+        var authUser = authenticationService.getAuthUser();
+        notificationService.markAsRead(authUser.id(), markNotificationsAsReadRequestDto);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (Exception e) {
-            LOGGER.warn("Invalid token used: {}", e.getMessage());
-            throw new UnauthorizedException("Invalid token");
-        }
-    }
 
-    private static void validToken(String token) {
-        if (token.isBlank()) {
-            LOGGER.warn("Empty token provided");
-            throw new UnauthorizedException("Token is empty");
-        }
-    }
-
-    private static void isHeaderPresent(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new UnauthorizedException("Missing or invalid Authorization header");
-        }
     }
 }
