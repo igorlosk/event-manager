@@ -1,6 +1,8 @@
 package dev.sorokin.eventnotificator.security;
 
 import dev.sorokin.eventnotificator.security.jwt.JwtTokenFilter;
+import dev.sorokin.eventnotificator.web.CustomAccessDeniedHandler;
+import dev.sorokin.eventnotificator.web.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,12 @@ public class SecurityConfiguration {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
 
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -32,6 +40,9 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/notifications").hasAnyAuthority("ADMIN", "USER")
                                 .requestMatchers(HttpMethod.POST, "/notifications").hasAnyAuthority("ADMIN", "USER")
                                 .anyRequest().authenticated())
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
+                                .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtTokenFilter, AnonymousAuthenticationFilter.class)
                 .build();
     }
