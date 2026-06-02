@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
-    name: event-manager
+    name: event-notificator
 
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
@@ -37,15 +37,9 @@ logging:
     root: INFO
     org.springframework.web: INFO
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui/index.html
-    url: /event-manager-openapi.yaml
-
 jwt:
   secretKey: Vw47liBU9qsTTOQVh26DSCMXO04XZyAQsRslmH3QlT6
 
 event:
   status:
     cron: "0 */5 * * * *"
-

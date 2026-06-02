@@ -40,13 +40,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     @EntityGraph(attributePaths = "registrations")
     List<EventEntity> findAllByOwnerId(Integer ownerId);
 
-//    @Query("SELECT DISTINCT e FROM EventEntity e " +
-//            "LEFT JOIN FETCH e.registrations " +
-//            "WHERE e.ownerId = :ownerId")
-//    List<EventEntity> findAllByOwnerIdWithRegistrations(@Param("ownerId") Integer ownerId);
-
-
-
     @Query("""
             SELECT e FROM EventEntity e 
             WHERE (:name IS NULL OR e.name = :name)
@@ -81,7 +74,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("SELECT e.id FROM EventEntity e WHERE e.status = :status " +
             "AND e.date + (e.duration)minute <= CURRENT_TIMESTAMP")
-    List<Long> indFinishedEventsWithStatus(@Param("status") EventStatus status);
+    List<Long> findFinishedEventsWithStatus(@Param("status") EventStatus status);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE EventEntity e SET e.status = :newStatus WHERE e.id IN :ids")

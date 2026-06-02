@@ -1,6 +1,9 @@
 package dev.sorokin.eventmanager.event.domain;
 
+import dev.sorokin.eventcommon.kafka.ChangeItem;
+import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import dev.sorokin.eventmanager.event.DateTimeConverter;
+import dev.sorokin.eventmanager.event.EventChangeSender;
 import dev.sorokin.eventmanager.event.api.EventDto;
 import dev.sorokin.eventmanager.event.api.EventSearchRequestDto;
 import dev.sorokin.eventmanager.event.db.EventEntity;
@@ -8,6 +11,7 @@ import dev.sorokin.eventmanager.event.db.EventRepository;
 import dev.sorokin.eventmanager.event.db.EventToEntityMapper;
 import dev.sorokin.eventmanager.location.Location;
 import dev.sorokin.eventmanager.location.LocationService;
+import dev.sorokin.eventmanager.registration.db.RegistrationEntity;
 import dev.sorokin.eventmanager.users.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,8 +22,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -31,19 +37,22 @@ public class EventService {
     private final LocationService locationService;
     private final EventPermissionService eventPermissionService;
     private final DateTimeConverter dateTimeConverter;
+    private final EventChangeSender eventChangeSender;
 
     public EventService(
             EventRepository eventRepository,
             EventToEntityMapper eventToEntityMapper,
             LocationService locationService,
             EventPermissionService eventPermissionService,
-            DateTimeConverter dateTimeConverter) {
+            DateTimeConverter dateTimeConverter,
+            EventChangeSender eventChangeSender) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
 
+        this.eventChangeSender = eventChangeSender;
     }
 
     @Transactional
@@ -140,6 +149,26 @@ public class EventService {
 
         EventEntity updatedEvent = eventRepository.findById(eventId).orElseThrow();
         LOGGER.info("Event with id {} successfully updated by user {}", eventId, authUser.id());
+
+        List<Long> subscribers = eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList();
+        Long eventOwnerId = Long.valueOf(eventEntity.getOwnerId());
+        List<ChangeItem> changeItemList = compareEvents(eventDto, eventEntity);
+
+        if (!changeItemList.isEmpty()) {
+            eventChangeSender.sendChanges(new EventChangeKafkaMessage(
+                    UUID.randomUUID(),
+                    "EVENT_UPDATED",
+                    eventEntity.getName(),
+                    eventId,
+                    LocalDateTime.now(),
+                    eventOwnerId,
+                    authUser.id(),
+                    subscribers,
+                    changeItemList
+            ));
+        }
+
+
         return eventToEntityMapper.toDomain(updatedEvent);
     }
 
@@ -210,14 +239,91 @@ public class EventService {
         List<Long> started = eventRepository.findStartedEventsWithStatus(EventStatus.WAIT_START);
         if (!started.isEmpty()) {
             started.forEach(id -> eventRepository.changeStatus(started, EventStatus.STARTED));
+            sendMessage(started, EventStatus.WAIT_START, EventStatus.STARTED);
             LOGGER.info("Updated {} events to STARTED", started.size());
         }
 
-        List<Long> finished = eventRepository.indFinishedEventsWithStatus(EventStatus.STARTED);
+        List<Long> finished = eventRepository.findFinishedEventsWithStatus(EventStatus.STARTED);
         if (!finished.isEmpty()) {
             finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
+            sendMessage(started, EventStatus.STARTED, EventStatus.FINISHED);
             LOGGER.info("Updated {} events to FINISHED", started.size());
         }
+    }
+
+    private void sendMessage(List<Long> eventsToChangeId, EventStatus eventStatusOld, EventStatus eventStatusNew) {
+        List<ChangeItem> changeItem = List.of(new ChangeItem("Status", eventStatusOld, eventStatusNew));
+        List<EventEntity> entityList = eventRepository.findAllById(eventsToChangeId);
+        entityList.forEach(eventEntity -> {
+            eventChangeSender.sendChanges(new EventChangeKafkaMessage(
+                    UUID.randomUUID(),
+                    "EVENT_UPDATED",
+                    eventEntity.getName(),
+                    Long.valueOf(eventEntity.getId()),
+                    LocalDateTime.now(),
+                    Long.valueOf(eventEntity.getOwnerId()),
+                    null,
+                    eventEntity.getRegistrations().stream().map((RegistrationEntity::getUserId)).toList(),
+                    changeItem
+            ));
+        });
+    }
+
+    public List<ChangeItem> compareEvents(EventDto eventDto, EventEntity eventEntity) {
+        List<ChangeItem> list = new ArrayList<>();
+
+        if (!eventDto.name().equals(eventEntity.getName())) {
+            list.add(new ChangeItem(
+                    "name",
+                    eventEntity.getName(),
+                    eventDto.name()
+            ));
+
+        }
+        if (!eventDto.locationId().equals(eventEntity.getLocationId())) {
+            list.add(new ChangeItem(
+                    "locationId",
+                    eventEntity.getLocationId(),
+                    eventDto.locationId()
+            ));
+        }
+
+        if (!eventDto.duration().equals(eventEntity.getDuration())) {
+            list.add(new ChangeItem(
+                    "duration",
+                    eventEntity.getDuration(),
+                    eventDto.duration()
+            ));
+        }
+
+        if (!eventDto.cost().equals(eventEntity.getCost())) {
+            list.add(new ChangeItem(
+                    "cost",
+                    eventEntity.getCost(),
+                    eventDto.cost()
+            ));
+        }
+
+        if (!eventDto.maxPlaces().equals(eventEntity.getMaxPlaces())) {
+            list.add(new ChangeItem(
+                    "maxPlace",
+                    eventEntity.getMaxPlaces(),
+                    eventDto.maxPlaces()
+            ));
+        }
+
+        LocalDateTime eventDtoTime = dateTimeConverter.parseToLocalDateTime(eventDto.date());
+        LocalDateTime eventEntityTime = eventEntity.getDate();
+
+        if (!eventDtoTime.isEqual(eventEntityTime)) {
+            list.add(new ChangeItem(
+                    "date",
+                    eventDtoTime,
+                    eventEntityTime
+            ));
+        }
+
+        return list;
     }
 }
 
