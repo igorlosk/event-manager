@@ -1,6 +1,9 @@
 package dev.sorokin.eventmanager.location;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,6 +25,10 @@ public class LocationService {
         return locationEntityConverter.toDomain(locationRepository.save(entityLocation));
     }
 
+    @Cacheable(
+            value = "locations",
+            key = "'all'"
+    )
     public List<Location> getAllLocations() {
         return locationRepository.findAll()
                 .stream()
@@ -30,6 +37,10 @@ public class LocationService {
 
     }
 
+    @CacheEvict(
+            value = "locations",
+            key = "'id:' + #id"
+    )
     public void deleteLocation(Integer id) {
         if (!locationRepository.existsById(id)) {
             throw new EntityNotFoundException("Location does not exists by id=%s".formatted(id));
@@ -37,12 +48,20 @@ public class LocationService {
         locationRepository.deleteById(id);
     }
 
+    @Cacheable(
+            value = "locations",
+            key = "'id:' + #id"
+    )
     public Location getLocationById(Integer id) {
         LocationEntity location = locationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Location does not exists by id=%s".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("Location does not exist by id=%s".formatted(id)));
         return locationEntityConverter.toDomain(location);
     }
 
+    @CacheEvict(
+            value = "locations",
+            key = "'id:' + #id"
+    )
     public Location updateLocation(Location location, Integer id) {
         if (!locationRepository.existsById(id)) {
             throw new EntityNotFoundException("Location does not exists by id=%s".formatted(id));
