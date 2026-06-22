@@ -2,6 +2,7 @@ package dev.sorokin.eventmanager.event.domain;
 
 import dev.sorokin.eventcommon.kafka.ChangeItem;
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
+import dev.sorokin.eventmanager.config.CacheConfiguration;
 import dev.sorokin.eventmanager.event.DateTimeConverter;
 import dev.sorokin.eventmanager.event.EventChangeSender;
 import dev.sorokin.eventmanager.event.api.EventDto;
@@ -17,6 +18,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -38,6 +42,7 @@ public class EventService {
     private final EventPermissionService eventPermissionService;
     private final DateTimeConverter dateTimeConverter;
     private final EventChangeSender eventChangeSender;
+    private final CacheManager cacheManager;
 
     public EventService(
             EventRepository eventRepository,
@@ -45,14 +50,15 @@ public class EventService {
             LocationService locationService,
             EventPermissionService eventPermissionService,
             DateTimeConverter dateTimeConverter,
-            EventChangeSender eventChangeSender) {
+            EventChangeSender eventChangeSender,
+            CacheManager cacheManager) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
-
         this.eventChangeSender = eventChangeSender;
+        this.cacheManager = cacheManager;
     }
 
     @Transactional
@@ -97,6 +103,10 @@ public class EventService {
         return eventToEntityMapper.toDomain(savedEntity);
     }
 
+    @Cacheable(
+            value = "events",
+            key = "'id:' + #id"
+    )
     public Event getEventById(Long id) {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No event with id " + id));
@@ -104,6 +114,10 @@ public class EventService {
         return eventToEntityMapper.toDomain(eventEntity);
     }
 
+    @CacheEvict(
+            value = "events",
+            key = "'id:' + #eventId"
+    )
     public Event updateEvent(EventDto eventDto, User authUser, Long eventId) {
 
         EventEntity eventEntity = eventRepository.findById(eventId)
@@ -172,6 +186,10 @@ public class EventService {
         return eventToEntityMapper.toDomain(updatedEvent);
     }
 
+    @CacheEvict(
+            value = "events",
+            key = "'id:' + #id"
+    )
     @Transactional
     public void deleteEvent(Long id, User authUser) {
 
@@ -238,16 +256,24 @@ public class EventService {
         LOGGER.info("Starting status update job");
         List<Long> started = eventRepository.findStartedEventsWithStatus(EventStatus.WAIT_START);
         if (!started.isEmpty()) {
-            started.forEach(id -> eventRepository.changeStatus(started, EventStatus.STARTED));
-            sendMessage(started, EventStatus.WAIT_START, EventStatus.STARTED);
-            LOGGER.info("Updated {} events to STARTED", started.size());
+            started.forEach(id -> {
+                eventRepository.changeStatus(started, EventStatus.STARTED);
+                sendMessage(started, EventStatus.WAIT_START, EventStatus.STARTED);
+                cacheManager.getCache("events").evict("id:" + id);
+                LOGGER.info("Updated {} events to STARTED", started.size());
+            });
+
         }
 
         List<Long> finished = eventRepository.findFinishedEventsWithStatus(EventStatus.STARTED);
         if (!finished.isEmpty()) {
-            finished.forEach(id -> eventRepository.changeStatus(finished, EventStatus.FINISHED));
-            sendMessage(started, EventStatus.STARTED, EventStatus.FINISHED);
-            LOGGER.info("Updated {} events to FINISHED", started.size());
+            finished.forEach(id -> {
+                eventRepository.changeStatus(finished, EventStatus.FINISHED);
+                sendMessage(started, EventStatus.STARTED, EventStatus.FINISHED);
+                cacheManager.getCache("events").evict("id:" + id);
+                LOGGER.info("Updated {} events to FINISHED", started.size());
+            });
+
         }
     }
 
