@@ -26,14 +26,20 @@ public class NotificationService {
 
     private final NotificationPayloadMapper notificationPayloadMapper;
 
+    private final NotificationCounterService notificationCounterService;
+
     private final DateTimeConverter dateTimeConverter;
 
     public NotificationService(
             NotificationEventPayloadEntityRepository notificationEventPayloadEntityRepository,
-            NotificationEntityRepository notificationEntityRepository, NotificationPayloadMapper notificationPayloadMapper, DateTimeConverter dateTimeConverter) {
+            NotificationEntityRepository notificationEntityRepository,
+            NotificationPayloadMapper notificationPayloadMapper,
+            NotificationCounterService notificationCounterService,
+            DateTimeConverter dateTimeConverter) {
         this.notificationEventPayloadEntityRepository = notificationEventPayloadEntityRepository;
         this.notificationEntityRepository = notificationEntityRepository;
         this.notificationPayloadMapper = notificationPayloadMapper;
+        this.notificationCounterService = notificationCounterService;
         this.dateTimeConverter = dateTimeConverter;
     }
 
@@ -50,6 +56,7 @@ public class NotificationService {
                             null,
                             eventPayloadEntity
                     ));
+                    notificationCounterService.incrementUnread(subscriberId,1);
                     LOGGER.info("Created notification for user id={}", subscriberId);
                 }
         );
@@ -93,7 +100,7 @@ public class NotificationService {
         if (updatedCount == 0) {
             throw new IllegalArgumentException("No Ids to update");
         }
-
+        notificationCounterService.syncUnreadFromDatabase(userId);
         LOGGER.info("Marked as read {} notifications for user {}", updatedCount, userId);
     }
 
