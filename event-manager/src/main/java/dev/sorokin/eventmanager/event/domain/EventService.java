@@ -214,6 +214,11 @@ public class EventService {
         LOGGER.info("Event with id {} successfully deleted by user {}", id, authUser.id());
     }
 
+
+    @Cacheable(
+            value = "events",
+            key = "'all'"
+    )
     @Transactional()
     public List<Event> getAllMyEvents(User authUser) {
 
