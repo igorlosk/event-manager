@@ -3,6 +3,7 @@ package dev.sorokin.eventmanager.location;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,10 +37,13 @@ public class LocationService {
 
     }
 
-    @CacheEvict(
-            value = "locations",
-            key = "'id:' + #id"
-    )
+    @Caching(evict = {
+            @CacheEvict(
+                    value = "locations",
+                    key = "'all'"),
+            @CacheEvict(
+                    value = "locations",
+                    key = "'id:' + #id")})
     public void deleteLocation(Integer id) {
         if (!locationRepository.existsById(id)) {
             throw new EntityNotFoundException("Location does not exists by id=%s".formatted(id));
