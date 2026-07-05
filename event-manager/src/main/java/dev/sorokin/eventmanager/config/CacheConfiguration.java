@@ -2,13 +2,16 @@ package dev.sorokin.eventmanager.config;
 
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.sorokin.eventmanager.event.domain.Event;
 import dev.sorokin.eventmanager.location.Location;
+import dev.sorokin.eventmanager.web.RedisCacheErrorHandler;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -22,6 +25,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -61,22 +65,35 @@ public class CacheConfiguration {
 
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-        var locationSerializer = new Jackson2JsonRedisSerializer<>(objectMapper, Location.class);
+        JavaType locationListType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, Location.class);
+        Jackson2JsonRedisSerializer<List<Location>> locationListSerializer =
+                new Jackson2JsonRedisSerializer<>(objectMapper, locationListType);
+
         RedisCacheConfiguration locationConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(1))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(locationSerializer));
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(locationListSerializer));
         cacheConfigurations.put("locations", locationConfig);
 
-        var eventSerializer = new Jackson2JsonRedisSerializer<>(objectMapper, Event.class);
+        JavaType eventListType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, Event.class);
+        Jackson2JsonRedisSerializer<List<Event>> eventListSerializer =
+                new Jackson2JsonRedisSerializer<>(objectMapper, eventListType);
+
         RedisCacheConfiguration eventsConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(1))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(eventSerializer));
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(eventListSerializer));
         cacheConfigurations.put("events", eventsConfig);
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .withInitialCacheConfigurations(cacheConfigurations)
                 .transactionAware()
                 .build();
+    }
+
+    @Bean
+    public CacheErrorHandler cacheErrorHandler() {
+        return new RedisCacheErrorHandler();
     }
 
 }
