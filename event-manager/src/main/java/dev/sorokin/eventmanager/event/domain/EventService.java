@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.event.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.sorokin.eventcommon.kafka.ChangeItem;
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import dev.sorokin.eventmanager.config.CacheConfiguration;
@@ -18,9 +19,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.CacheManager;
+//import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,10 @@ public class EventService {
     private final EventPermissionService eventPermissionService;
     private final DateTimeConverter dateTimeConverter;
     private final EventChangeSender eventChangeSender;
-    private final CacheManager cacheManager;
+    //    private final CacheManager cacheManager;
+    private final CacheConfiguration cacheConfiguration;
+    private final RedisConnectionFactory redisConnectionFactory;
+    private final ObjectMapper objectMapper;
 
     public EventService(
             EventRepository eventRepository,
@@ -51,14 +56,18 @@ public class EventService {
             EventPermissionService eventPermissionService,
             DateTimeConverter dateTimeConverter,
             EventChangeSender eventChangeSender,
-            CacheManager cacheManager) {
+            CacheConfiguration cacheConfiguration,
+            RedisConnectionFactory redisConnectionFactory,
+            ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
         this.eventToEntityMapper = eventToEntityMapper;
         this.locationService = locationService;
         this.eventPermissionService = eventPermissionService;
         this.dateTimeConverter = dateTimeConverter;
         this.eventChangeSender = eventChangeSender;
-        this.cacheManager = cacheManager;
+        this.cacheConfiguration = cacheConfiguration;
+        this.redisConnectionFactory = redisConnectionFactory;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -264,7 +273,7 @@ public class EventService {
             started.forEach(id -> {
                 eventRepository.changeStatus(started, EventStatus.STARTED);
                 sendMessage(started, EventStatus.WAIT_START, EventStatus.STARTED);
-                cacheManager.getCache("events").evict("id:" + id);
+                cacheConfiguration.cacheManager(redisConnectionFactory, objectMapper).getCache("events").evict("id:" + id);
                 LOGGER.info("Updated {} events to STARTED", started.size());
             });
 
@@ -275,7 +284,7 @@ public class EventService {
             finished.forEach(id -> {
                 eventRepository.changeStatus(finished, EventStatus.FINISHED);
                 sendMessage(started, EventStatus.STARTED, EventStatus.FINISHED);
-                cacheManager.getCache("events").evict("id:" + id);
+                cacheConfiguration.cacheManager(redisConnectionFactory, objectMapper).getCache("events").evict("id:" + id);
                 LOGGER.info("Updated {} events to FINISHED", started.size());
             });
 

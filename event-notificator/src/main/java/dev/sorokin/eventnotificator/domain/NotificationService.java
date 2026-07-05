@@ -70,6 +70,7 @@ public class NotificationService {
                 .toList();
 
         List<NotificationResponse> responses = list.stream()
+                .filter(notificationEntity -> Boolean.FALSE.equals(notificationEntity.isRead()))
                 .map(notificationEntity -> new NotificationResponse(
                         notificationEntity.getId(),
                         notificationEntity.getPayload().getEventType(),

@@ -1,7 +1,6 @@
 package dev.sorokin.eventmanager.config;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -73,8 +72,6 @@ public class CacheConfiguration {
                 .entryTtl(Duration.ofMinutes(1))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(eventSerializer));
         cacheConfigurations.put("events", eventsConfig);
-
-
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .withInitialCacheConfigurations(cacheConfigurations)
