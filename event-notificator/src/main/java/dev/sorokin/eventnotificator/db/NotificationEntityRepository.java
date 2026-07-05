@@ -23,4 +23,8 @@ public interface NotificationEntityRepository extends JpaRepository<Notification
     @Modifying
     @Query("DELETE FROM NotificationEntity n WHERE n.payload.occurredAt <= :thresholdDate")
     int deleteNotificationsByPayloadDate(LocalDateTime thresholdDate);
+
+
+    @Query("SELECT COUNT(n) FROM NotificationEntity n WHERE n.userId = :userId AND n.isRead = false")
+    long countByUserIdAndReadFalse(@Param("userId") Long userId);
 }
